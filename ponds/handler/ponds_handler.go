@@ -104,3 +104,77 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 	))
 }
 
+//Get pond by id
+func (h *PondsHandler) Get(c *gin.Context) {
+	//Get id from params
+	id, _ := c.Params.Get("id")
+	idNum, _ := strconv.Atoi(id)
+
+	//Find pond by id, if not found return error
+	pond, err := h.service.Get(uint(idNum))
+	if err != nil && err.Error() == "Farm not found" {
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
+			"Farm not found",
+			false,
+			nil,
+		))
+		return
+	}
+
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
+		"Successfully retrieved pond",
+		true,
+		pond,
+	))
+}
+
+//Update pond handler
+func (h *PondsHandler) Update(c *gin.Context) {
+	//Get id from params
+	id, _ := c.Params.Get("id")
+	idNum, _ := strconv.Atoi(id)
+
+	//Find pond by id, if not found return error
+	pond, err := h.service.Get(uint(idNum))
+	if err != nil && err.Error() == "Farm not found" {
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Farm not found",
+			false,
+			nil,
+		))
+		return
+	}
+
+	//validate input
+	var input domains.PondsInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, helpers.ResponseFormat(
+			"Please fill all required fields",
+			false,
+			nil,
+		))
+		return
+	}
+
+	pond.Name = input.Name
+	pond.Slug = slug.Make(input.Name)
+	pond.UpdatedAt = time.Now().Unix()
+
+	//Update pond, and will return error if insert duplicate name
+	if err := h.service.Update(&pond); err != nil {
+		statusCode := http.StatusInternalServerError
+
+		//if error is duplicate key value
+		if err.Error() == "Farm already exists" {
+			statusCode = http.StatusConflict
+		}
+
+		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		return
+	}
+
+	c.JSON(http.StatusCreated, helpers.ResponseFormat(
+		"Successfully updated pond",
+		true,
+		pond,
+	))
+}
