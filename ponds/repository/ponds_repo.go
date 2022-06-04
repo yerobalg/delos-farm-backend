@@ -24,3 +24,8 @@ func (r *PondsRepository) Delete(pond *domains.Ponds) error{
 	return r.conn.Delete(pond).Error
 }
 
+//update pond repository
+func (r* PondsRepository) Update(pond *domains.Ponds) error{
+	return r.conn.Save(pond).Error
+}
+
