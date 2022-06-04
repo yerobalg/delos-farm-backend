@@ -29,3 +29,10 @@ func (r* PondsRepository) Update(pond *domains.Ponds) error{
 	return r.conn.Save(pond).Error
 }
 
+//get pond by id repository
+func (r *PondsRepository) Get(id uint) (domains.Ponds, error) {
+	var pond domains.Ponds
+	err := r.conn.First(&pond, id).Error
+	return pond, err
+}
+
