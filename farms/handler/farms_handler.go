@@ -99,3 +99,25 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 	))
 }
 
+//Get farm by id
+func (h* FarmsHandler) Get(c *gin.Context) {
+	//Get id from params
+	id, _ := c.Params.Get("id")
+	idNum, _ := strconv.Atoi(id) 
+
+	//Find farm by id, if not found return error
+	farm, err := h.service.Get(uint(idNum));
+	if err != nil && err.Error() == "Farm not found" {
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
+			"Farm not found",
+			false,
+			nil,
+		))
+	}
+
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
+		"Successfully retrieved farm",
+		true,
+		farm,
+	))
+}
