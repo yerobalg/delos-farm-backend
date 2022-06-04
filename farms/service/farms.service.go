@@ -47,16 +47,16 @@ func (s *FarmsService) Get(id uint) (domains.Farms, error) {
 	return farm, err
 }
 
- //Get all farms service
- func (s *FarmsService) GetAll(
-	 limitInput string,
-	 offsetInput string,
-	) ([]domains.Farms, error) {
+//Get all farms service
+func (s *FarmsService) GetAll(
+	limitInput string,
+	offsetInput string,
+) ([]domains.Farms, error) {
 	limit, _ := strconv.Atoi(limitInput)
 	offset, _ := strconv.Atoi(offsetInput)
-
-	farms, err := s.repo.GetAll(limit, offset)
 	
+	farms, err := s.repo.GetAll(limit, offset)
+
 	if err == nil && len(farms) == 0 { 
 		return farms, errors.New("No farms found")
 	}

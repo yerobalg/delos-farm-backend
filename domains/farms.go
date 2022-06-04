@@ -11,6 +11,10 @@ type Farms struct {
 	Ponds []Ponds `json:"ponds" gorm:"foreignkey:FarmID;constraint:OnDelete:CASCADE"`
 }
 
+type FarmsInput struct {
+	Name string `json:"name" binding:"required"`
+}
+
 type FarmsService interface {
 	Create(farm *Farms) error
 	Delete(farm *Farms) error
