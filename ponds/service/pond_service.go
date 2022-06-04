@@ -28,3 +28,8 @@ func (s *PondsService) Create(pond *domains.Ponds) error {
 	return err	
 }
 
+//Delete pond service
+func (s* PondsService) Delete(pond *domains.Ponds) error {
+	return s.repo.Delete(pond)
+}
+
