@@ -70,3 +70,37 @@ func (h *PondsHandler) Create(c *gin.Context) {
 	))
 }
 
+//Delete pond handler
+func (h *PondsHandler) Delete(c *gin.Context) {
+	//Get Id from params
+	id, _ := c.Params.Get("id")
+	idNum, _ := strconv.Atoi(id)
+
+	//Find pond by id, if not found return error
+	pond, err := h.service.Get(uint(idNum))
+	if err != nil && err.Error() == "Farm not found" {
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
+			"Farm not found",
+			false,
+			nil,
+		))
+		return
+	}
+
+	//Delete the pond
+	if err := h.service.Delete(&pond); err != nil {
+		c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
+			"Failed to delete pond",
+			false,
+			nil,
+		))
+		return
+	}
+
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
+		"Successfully deleted pond",
+		true,
+		nil,
+	))
+}
+
