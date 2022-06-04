@@ -14,7 +14,12 @@ func NewFarmsRepository(db *gorm.DB) domains.FarmsRepository {
 	return &FarmsRepository{db}
 }
 
-//Ceate new farms repository
+//Ceate new farm repository
 func (r *FarmsRepository) Create(farm *domains.Farms) error{
 	return r.conn.Create(farm).Error
+}
+
+//delete farm repository
+func (r *FarmsRepository) Delete(farm *domains.Farms) error{
+	return r.conn.Delete(farm).Error
 }
