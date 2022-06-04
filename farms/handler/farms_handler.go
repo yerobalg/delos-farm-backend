@@ -4,7 +4,7 @@ import (
 	"delos-farm-backend/domains"
 	"delos-farm-backend/helpers"
 	"net/http"
-
+	"strconv"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 )
@@ -15,13 +15,16 @@ type FarmsHandler struct {
 
 func NewFarmsHandler(r *gin.RouterGroup, service domains.FarmsService) {
 	handler := &FarmsHandler{service: service}
-	r.Group("/farms")
+	api := r.Group("/farms")
 	{
-		r.POST("/", handler.Create)
+		api.POST("/", handler.Create)
+		api.DELETE("/:id", handler.Delete)
 	}
 }
 
+//Create farm handler
 func (h *FarmsHandler) Create(c *gin.Context) {
+	//validate input
 	var input domains.FarmsInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, helpers.ResponseFormat(
@@ -31,13 +34,16 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 		))
 		return
 	}
-
+	
+	//create farm entity
 	farm := domains.Farms{
 		Name: input.Name,
 		Slug: slug.Make(input.Name),
 	}
 
+	//Create the farm, and will return error if insert duplicate name
 	if err := h.service.Create(&farm); err != nil {
+		//if error is duplicate key value
 		if err.Error() == "Farm already exists" {
 			c.JSON(http.StatusConflict, helpers.ResponseFormat(
 				err.Error(),
@@ -60,3 +66,36 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 		farm,
 	))
 }
+
+//Delete farm handler
+func (h *FarmsHandler) Delete(c *gin.Context) {
+	//Get Id from params
+	id, _ := c.Params.Get("id")
+	idNum, _ := strconv.Atoi(id) 
+
+	//Find farm by id, if not found return error
+	farm, err := h.service.Get(uint(idNum));
+	if err != nil && err.Error() == "Farm not found" {
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
+			"Farm not found",
+			false,
+			nil,
+		))
+	}
+
+	//Delete the farm
+	if err := h.service.Delete(&farm); err != nil {
+		c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
+			"Failed to delete farm",
+			false,
+			nil,
+		))
+	}
+
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
+		"Successfully deleted farm",
+		true,
+		nil,
+	))
+}
+
