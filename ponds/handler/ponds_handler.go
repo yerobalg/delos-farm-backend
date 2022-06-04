@@ -18,7 +18,7 @@ func NewPondsHandler(r *gin.RouterGroup, service domains.PondsService) {
 	handler := &PondsHandler{service: service}
 	api := r.Group("/ponds")
 	{
-		api.POST("/", handler.Create)
+		api.POST("/:farmId", handler.Create)
 		api.DELETE("/:id", handler.Delete)
 		api.GET("/:id", handler.Get)
 		api.GET("/", handler.GetAll)
@@ -28,6 +28,18 @@ func NewPondsHandler(r *gin.RouterGroup, service domains.PondsService) {
 
 //Create pond handler
 func (h *PondsHandler) Create(c *gin.Context) {
+	//get farm id from params
+	farmId, _ := c.Params.Get("farmId")
+	farmIdNum, err := strconv.Atoi(farmId)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, helpers.ResponseFormat(
+			"Invalid farm id",
+			false,
+			nil,
+		))
+		return
+	}
+
 	//validate input
 	var input domains.PondsInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -45,14 +57,17 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		UpdatedAt: time.Now().Unix(),
 		Name:      input.Name,
 		Slug:      slug.Make(input.Name),
+		FarmID:    uint(farmIdNum),
 	}
 
 	//Create the pond, and will return error if insert duplicate name
 	if err := h.service.Create(&pond); err != nil {
 		statusCode := http.StatusInternalServerError
-		//if error is duplicate key value
-		if err.Error() == "Farm already exists" {
+		//if error is duplicate key value and farm id not found
+		if err.Error() == "Pond already exists" {
 			statusCode = http.StatusConflict
+		} else if err.Error() == "Farm not found" { 
+			statusCode = http.StatusNotFound
 		}
 
 		c.JSON(statusCode, helpers.ResponseFormat(
@@ -78,9 +93,9 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 
 	//Find pond by id, if not found return error
 	pond, err := h.service.Get(uint(idNum))
-	if err != nil && err.Error() == "Farm not found" {
+	if err != nil && err.Error() == "Pond not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
-			"Farm not found",
+			"Pond not found",
 			false,
 			nil,
 		))
@@ -112,9 +127,9 @@ func (h *PondsHandler) Get(c *gin.Context) {
 
 	//Find pond by id, if not found return error
 	pond, err := h.service.Get(uint(idNum))
-	if err != nil && err.Error() == "Farm not found" {
+	if err != nil && err.Error() == "Pond not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
-			"Farm not found",
+			"Pond not found",
 			false,
 			nil,
 		))
@@ -136,8 +151,8 @@ func (h *PondsHandler) Update(c *gin.Context) {
 
 	//Find pond by id, if not found return error
 	pond, err := h.service.Get(uint(idNum))
-	if err != nil && err.Error() == "Farm not found" {
-		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Farm not found",
+	if err != nil && err.Error() == "Pond not found" {
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Pond not found",
 			false,
 			nil,
 		))
@@ -164,7 +179,7 @@ func (h *PondsHandler) Update(c *gin.Context) {
 		statusCode := http.StatusInternalServerError
 
 		//if error is duplicate key value
-		if err.Error() == "Farm already exists" {
+		if err.Error() == "Pond already exists" {
 			statusCode = http.StatusConflict
 		}
 
@@ -194,7 +209,7 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 	}
 
 	//get the ponds, and will return error if not found
-	_, err := h.service.GetAll(limit, offset)
+	ponds, err := h.service.GetAll(limit, offset)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "No ponds found" {
@@ -208,6 +223,6 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, helpers.ResponseFormat(
 		"Successfully retrieved ponds",
 		true,
-		time.Now().Unix(),
+		ponds,
 	))
 }

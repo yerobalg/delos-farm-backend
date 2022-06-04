@@ -194,7 +194,7 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 	}
 
 	//get the farms, and will return error if not found
-	_, err := h.service.GetAll(limit, offset)
+	farms, err := h.service.GetAll(limit, offset)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "No farms found" {
@@ -208,6 +208,6 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, helpers.ResponseFormat(
 		"Successfully retrieved farms",
 		true,
-		time.Now().Unix(),
+		farms,
 	))
 }

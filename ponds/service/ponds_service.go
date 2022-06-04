@@ -2,9 +2,9 @@ package service
 
 import (
 	"delos-farm-backend/domains"
-	"strings"
 	"errors"
 	"strconv"
+	"strings"
 )
 
 type PondsService struct {
@@ -24,6 +24,8 @@ func (s *PondsService) Create(pond *domains.Ponds) error {
 	}
 	if (strings.Contains(err.Error(), "duplicate key value")) {
 		return errors.New("Pond already exists")
+	} else if(strings.Contains(err.Error(), "violates foreign key")) {
+		return errors.New("Farm not found")
 	}
 	return err	
 }

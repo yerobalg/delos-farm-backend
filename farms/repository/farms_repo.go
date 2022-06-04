@@ -15,17 +15,17 @@ func NewFarmsRepository(conn *gorm.DB) domains.FarmsRepository {
 }
 
 //Ceate new farm repository
-func (r *FarmsRepository) Create(farm *domains.Farms) error{
+func (r *FarmsRepository) Create(farm *domains.Farms) error {
 	return r.conn.Create(farm).Error
 }
 
 //delete farm repository
-func (r *FarmsRepository) Delete(farm *domains.Farms) error{
+func (r *FarmsRepository) Delete(farm *domains.Farms) error {
 	return r.conn.Delete(farm).Error
 }
 
 //update farm repository
-func (r* FarmsRepository) Update(farm *domains.Farms) error{
+func (r *FarmsRepository) Update(farm *domains.Farms) error {
 	return r.conn.Save(farm).Error
 }
 
@@ -36,12 +36,17 @@ func (r *FarmsRepository) Get(id uint) (domains.Farms, error) {
 	return farm, err
 }
 
- //get all farms repository
+//get all farms repository
 func (r *FarmsRepository) GetAll(
-	limit int, 
+	limit int,
 	offset int,
 ) ([]domains.Farms, error) {
 	var farms []domains.Farms
-	err := r.conn.Limit(limit).Offset(offset).Find(&farms).Error
+	err := r.conn.
+		Limit(limit).
+		Offset(offset).
+		Preload("Ponds").
+		Find(&farms).
+		Error
 	return farms, err
 }

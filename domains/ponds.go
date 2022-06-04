@@ -9,8 +9,8 @@ type Ponds struct {
 	CreatedAt int64          `json:"created_at"`
 	UpdatedAt int64          `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-	Name      string         `json:"name"`
-	Slug      string         `json:"slug"`
+	Name      string         `json:"name" gorm:"type:varchar(255);column:name;not null"`
+	Slug      string         `json:"slug" gorm:"type:varchar(255);column:slug;unique;not null"`
 	FarmID    uint           `json:"farm_id"`
 	Farms     Farms          `json:"farms" gorm:"foreignkey:FarmID"`
 }
