@@ -12,5 +12,6 @@ type Farms struct {
 }
 
 type FarmsRepository interface {
+	Create(farm *Farms) error
 	
 }
