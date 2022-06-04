@@ -1,7 +1,10 @@
 package middlewares
 
 import (
+	"context"
+	"delos-farm-backend/domains"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 )
 
 type Middleware struct{}
@@ -19,5 +22,35 @@ func CorsMiddleware() gin.HandlerFunc {
 		} else {
 			c.Next()
 		}
+	}
+}
+
+func StatsMiddleware(redisClient *redis.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		apiCountKey := c.Request.Method + "_" + c.Request.URL.Path
+		uniqueCallCountKey := "ip_" + c.ClientIP()
+
+		apiCountRes, err := redisClient.Incr(
+			context.Background(), apiCountKey,
+		).Result()
+		if err != nil {
+			c.Next()
+			return
+		}
+
+		uniqueCallCountRes, err := redisClient.Incr(
+			context.Background(), uniqueCallCountKey,
+		).Result()
+		if err != nil {
+			c.Next()
+			return
+		}
+
+		stats := domains.Stats{
+			APICount: apiCountRes,
+			UniqueCallCount: uniqueCallCountRes,
+		}
+
+		c.Set("stats", stats)
 	}
 }

@@ -24,7 +24,12 @@ func main() {
 	}
 
 	//init database
-	db, err := bootstrap.InitDB()
+	db, err := bootstrap.InitPostgres()
+	if err != nil {
+		panic(err)
+	}
+
+	redisClient, err := bootstrap.InitRedisClient()
 	if err != nil {
 		panic(err)
 	}
@@ -32,6 +37,7 @@ func main() {
 	//init router
 	engine := gin.Default()
 	engine.Use(middlewares.CorsMiddleware())
+	engine.Use(middlewares.StatsMiddleware(redisClient))
 	router := engine.Group("/api/v1")
 
 	//init farms

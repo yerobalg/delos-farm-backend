@@ -6,10 +6,10 @@ import (
 	"gorm.io/gorm"
 	"os"
 	"delos-farm-backend/domains"
+	"github.com/go-redis/redis/v8"
 )
 
-func InitDB() (*gorm.DB, error) {
-
+func InitPostgres() (*gorm.DB, error) {
 	dataSourceName := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s",
 		os.Getenv("DB_USERNAME"),
@@ -25,7 +25,7 @@ func InitDB() (*gorm.DB, error) {
 		return nil, error
 	}
 
-	fmt.Println("Successfully connected to datøabase!")
+	fmt.Println("Successfully connected to database!")
 
 	err := db.AutoMigrate(
 		&domains.Farms{},
@@ -33,4 +33,21 @@ func InitDB() (*gorm.DB, error) {
 	);
 
 	return db, err
+}
+
+func InitRedisClient() (*redis.Client, error) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       0,
+	})
+
+	_, err := client.Ping(client.Context()).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Successfully connected to redis!")
+
+	return client, nil
 }
