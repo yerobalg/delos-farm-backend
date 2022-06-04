@@ -24,3 +24,7 @@ func (s *FarmsService) Create(farm *domains.Farms) error {
 	}
 	return err	
 }
+
+func (s* FarmsService) Delete(farm *domains.Farms) error {
+	return s.repo.Delete(farm)
+}
