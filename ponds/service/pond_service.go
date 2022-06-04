@@ -59,7 +59,21 @@ func (s *PondsService) Get(id uint) (domains.Ponds, error) {
 	return pond, err
 }
 
+//Get all ponds service
+func (s *PondsService) GetAll(
+	limitInput string,
+	offsetInput string,
+) ([]domains.Ponds, error) {
+	limit, _ := strconv.Atoi(limitInput)
+	offset, _ := strconv.Atoi(offsetInput)
+	
+	ponds, err := s.repo.GetAll(limit, offset)
 
+	if err == nil && len(ponds) == 0 { 
+		return ponds, errors.New("No ponds found")
+	}
+	return ponds, err
+}
 
 
 
