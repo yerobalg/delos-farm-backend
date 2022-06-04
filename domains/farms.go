@@ -10,3 +10,7 @@ type Farms struct {
 	Slug string `json:"slug" gorm:"type:varchar(255);column:slug;unique;not null"`
 	Ponds []Ponds `json:"ponds" gorm:"foreignkey:FarmID;constraint:OnDelete:CASCADE"`
 }
+
+type FarmsRepository interface {
+	
+}
