@@ -40,10 +40,10 @@ func (r *PondsRepository) Get(id uint) (domains.Ponds, error) {
  func (r *PondsRepository) GetAll(
 	limit int, 
 	offset int,
-) ([]domains.Farms, error) {
-	var farms []domains.Farms
-	err := r.conn.Limit(limit).Offset(offset).Find(&farms).Error
-	return farms, err
+) ([]domains.Ponds, error) {
+	var ponds []domains.Ponds
+	err := r.conn.Limit(limit).Offset(offset).Find(&ponds).Error
+	return ponds, err
 }
 
 
