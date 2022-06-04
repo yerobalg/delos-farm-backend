@@ -33,6 +33,18 @@ func (s* FarmsService) Delete(farm *domains.Farms) error {
 	return s.repo.Delete(farm)
 }
 
+//Update farm service
+func (s *FarmsService) Update(farm *domains.Farms) error {
+	err := s.repo.Update(farm)
+	if err == nil {
+		return nil
+	}
+	if (strings.Contains(err.Error(), "duplicate key value")) {
+		return errors.New("Farm already exists")
+	}
+	return err	
+}
+
 //Get farm by id service
 func (s *FarmsService) Get(id uint) (domains.Farms, error) {
 	farm, err := s.repo.Get(id)

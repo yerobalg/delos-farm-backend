@@ -18,6 +18,7 @@ type FarmsInput struct {
 type FarmsService interface {
 	Create(farm *Farms) error
 	Delete(farm *Farms) error
+	Update(farm *Farms) error
 	Get(id uint) (Farms, error)
 	GetAll(limitInput string, offsetInput string) ([]Farms, error)
 }
@@ -25,6 +26,7 @@ type FarmsService interface {
 type FarmsRepository interface {
 	Create(farm *Farms) error
 	Delete(farm *Farms) error
+	Update(farm *Farms) error
 	Get(id uint) (Farms, error)
 	GetAll(limit int, offset int) ([]Farms, error)
 }
