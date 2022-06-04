@@ -3,10 +3,10 @@ package handler
 import (
 	"delos-farm-backend/domains"
 	"delos-farm-backend/helpers"
-	"net/http"
-	"strconv"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
+	"net/http"
+	"strconv"
 )
 
 type FarmsHandler struct {
@@ -19,6 +19,9 @@ func NewFarmsHandler(r *gin.RouterGroup, service domains.FarmsService) {
 	{
 		api.POST("/", handler.Create)
 		api.DELETE("/:id", handler.Delete)
+		api.GET("/:id", handler.Get)
+		api.GET("/", handler.GetAll)
+		api.PUT("/:id", handler.Update)
 	}
 }
 
@@ -34,7 +37,7 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 		))
 		return
 	}
-	
+
 	//create farm entity
 	farm := domains.Farms{
 		Name: input.Name,
@@ -43,20 +46,17 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 
 	//Create the farm, and will return error if insert duplicate name
 	if err := h.service.Create(&farm); err != nil {
+		statusCode := http.StatusInternalServerError
 		//if error is duplicate key value
 		if err.Error() == "Farm already exists" {
-			c.JSON(http.StatusConflict, helpers.ResponseFormat(
-				err.Error(),
-				false,
-				nil,
-			))
-		} else {
-			c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
-				"Failed to create farm",
-				false,
-				nil,
-			))
+			statusCode = http.StatusConflict
 		}
+
+		c.JSON(statusCode, helpers.ResponseFormat(
+			err.Error(),
+			false,
+			nil,
+		))
 		return
 	}
 
@@ -71,10 +71,10 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 func (h *FarmsHandler) Delete(c *gin.Context) {
 	//Get Id from params
 	id, _ := c.Params.Get("id")
-	idNum, _ := strconv.Atoi(id) 
+	idNum, _ := strconv.Atoi(id)
 
 	//Find farm by id, if not found return error
-	farm, err := h.service.Get(uint(idNum));
+	farm, err := h.service.Get(uint(idNum))
 	if err != nil && err.Error() == "Farm not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Farm not found",
@@ -102,13 +102,13 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 }
 
 //Get farm by id
-func (h* FarmsHandler) Get(c *gin.Context) {
+func (h *FarmsHandler) Get(c *gin.Context) {
 	//Get id from params
 	id, _ := c.Params.Get("id")
-	idNum, _ := strconv.Atoi(id) 
+	idNum, _ := strconv.Atoi(id)
 
 	//Find farm by id, if not found return error
-	farm, err := h.service.Get(uint(idNum));
+	farm, err := h.service.Get(uint(idNum))
 	if err != nil && err.Error() == "Farm not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Farm not found",
@@ -126,16 +126,15 @@ func (h* FarmsHandler) Get(c *gin.Context) {
 }
 
 //Update farm handler
-func (h* FarmsHandler) Update(c *gin.Context) {
+func (h *FarmsHandler) Update(c *gin.Context) {
 	//Get id from params
 	id, _ := c.Params.Get("id")
 	idNum, _ := strconv.Atoi(id)
 
 	//Find farm by id, if not found return error
-	farm, err := h.service.Get(uint(idNum));
+	farm, err := h.service.Get(uint(idNum))
 	if err != nil && err.Error() == "Farm not found" {
-		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
-			"Farm not found",
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Farm not found",
 			false,
 			nil,
 		))
@@ -158,19 +157,14 @@ func (h* FarmsHandler) Update(c *gin.Context) {
 
 	//Update farm, and will return error if insert duplicate name
 	if err := h.service.Update(&farm); err != nil {
-		if (err.Error() == "Farm already exists") {
-			c.JSON(http.StatusConflict, helpers.ResponseFormat(
-				err.Error(),
-				false,
-				nil,
-			))
-		} else {
-			c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
-				"Failed to update farm",
-				false,
-				nil,
-			))
+		statusCode := http.StatusInternalServerError
+
+		//if error is duplicate key value
+		if err.Error() == "Farm already exists" {
+			statusCode = http.StatusConflict
 		}
+
+		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
 		return
 	}
 
@@ -178,5 +172,38 @@ func (h* FarmsHandler) Update(c *gin.Context) {
 		"Successfully updated farm",
 		true,
 		farm,
+	))
+}
+
+//Get all farms
+func (h *FarmsHandler) GetAll(c *gin.Context) {
+	//Get query params
+	limit, isLimitExist := c.GetQuery("limit")
+	offset, isOffsetExist := c.GetQuery("offset")
+
+	//the default for limit is 100 and offset is 0
+	if !isLimitExist {
+		limit = "100"
+	}
+	if !isOffsetExist {
+		offset = "0"
+	}
+
+	//get the farms, and will return error if not found
+	farms, err := h.service.GetAll(limit, offset)
+	if err != nil {
+		statusCode := http.StatusInternalServerError
+		if err.Error() == "No farms found" {
+			statusCode = http.StatusNotFound
+		}
+
+		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
+		"Successfully retrieved farms",
+		true,
+		farms,
 	))
 }
