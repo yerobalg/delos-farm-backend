@@ -33,3 +33,15 @@ func (s* PondsService) Delete(pond *domains.Ponds) error {
 	return s.repo.Delete(pond)
 }
 
+//Update pond service
+func (s *PondsService) Update(pond *domains.Ponds) error {
+	err := s.repo.Update(pond)
+	if err == nil {
+		return nil
+	}
+	if (strings.Contains(err.Error(), "duplicate key value")) {
+		return errors.New("Pond already exists")
+	}
+	return err	
+}
+
