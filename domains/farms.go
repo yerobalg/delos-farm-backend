@@ -11,16 +11,17 @@ type Farms struct {
 	Ponds []Ponds `json:"ponds" gorm:"foreignkey:FarmID;constraint:OnDelete:CASCADE"`
 }
 
-type FarmsRepository interface {
-	Create(farm *Farms) error
-	Delete(farm *Farms) error
-	Get(id uint) (Farms, error)
-	GetAll() ([]Farms, error)
-}
-
 type FarmsService interface {
 	Create(farm *Farms) error
 	Delete(farm *Farms) error
 	Get(id uint) (Farms, error)
-	GetAll() ([]Farms, error)
+	GetAll(limitInput string, offsetInput string) ([]Farms, error)
 }
+
+type FarmsRepository interface {
+	Create(farm *Farms) error
+	Delete(farm *Farms) error
+	Get(id uint) (Farms, error)
+	GetAll(limit int, offset int) ([]Farms, error)
+}
+

@@ -37,8 +37,11 @@ func (r *FarmsRepository) Get(id uint) (domains.Farms, error) {
 }
 
  //get all farms repository
-func (r *FarmsRepository) GetAll() ([]domains.Farms, error) {
+func (r *FarmsRepository) GetAll(
+	limit int, 
+	offset int,
+) ([]domains.Farms, error) {
 	var farms []domains.Farms
-	err := r.conn.Find(&farms).Error
+	err := r.conn.Limit(limit).Offset(offset).Find(&farms).Error
 	return farms, err
 }
