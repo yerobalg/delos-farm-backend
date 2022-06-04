@@ -19,5 +19,8 @@ func (r *PondsRepository) Create(pond *domains.Ponds) error{
 	return r.conn.Create(pond).Error
 }
 
-
+//delete pond repository
+func (r *PondsRepository) Delete(pond *domains.Ponds) error{
+	return r.conn.Delete(pond).Error
+}
 
