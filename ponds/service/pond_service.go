@@ -45,3 +45,21 @@ func (s *PondsService) Update(pond *domains.Ponds) error {
 	return err	
 }
 
+//Get pond by id service
+func (s *PondsService) Get(id uint) (domains.Ponds, error) {
+	pond, err := s.repo.Get(id)
+	if err == nil {
+		return pond, nil
+	}
+
+	if (strings.Contains(err.Error(), "record not found")) {
+		return pond, errors.New("Pond not found")
+	}
+
+	return pond, err
+}
+
+
+
+
+
