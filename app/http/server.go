@@ -7,9 +7,13 @@ import (
 	"github.com/joho/godotenv"
 	"fmt"
 	"delos-farm-backend/bootstrap"
-	"delos-farm-backend/farms/repository"
-	"delos-farm-backend/farms/service"
-	_farmsHandler "delos-farm-backend/farms/handler"
+	_farmsRepository "delos-farm-backend/farms/repository"
+	_farmsService "delos-farm-backend/farms/service"
+	farmsHandler "delos-farm-backend/farms/handler"
+	_pondsRepository "delos-farm-backend/ponds/repository"
+	_pondsService "delos-farm-backend/ponds/service"
+	pondsHandler "delos-farm-backend/ponds/handler"
+
 )
 
 func main() {
@@ -31,9 +35,14 @@ func main() {
 	router := engine.Group("/api/v1")
 
 	//init farms
-	farmsRepository := repository.NewFarmsRepository(db)
-	farmsService := service.NewFarmsService(farmsRepository)
-	_farmsHandler.NewFarmsHandler(router, farmsService)
+	farmsRepository := _farmsRepository.NewFarmsRepository(db)
+	farmsService := _farmsService.NewFarmsService(farmsRepository)
+	farmsHandler.NewFarmsHandler(router, farmsService)
+
+	//init ponds
+	pondsRepository := _pondsRepository.NewPondsRepository(db)
+	pondsService := _pondsService.NewPondsService(pondsRepository)
+	pondsHandler.NewPondsHandler(router, pondsService)
 
 	//run server
 	engine.Run(":" + os.Getenv("PORT"))

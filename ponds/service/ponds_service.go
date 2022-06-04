@@ -12,7 +12,7 @@ type PondsService struct {
 }
 
 //Constructor for ponds service
-func NewpondsService(repo domains.PondsRepository) domains.PondsService {
+func NewPondsService(repo domains.PondsRepository) domains.PondsService {
 	return &PondsService{repo: repo}
 }
 
