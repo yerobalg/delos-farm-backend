@@ -10,8 +10,8 @@ type FarmsRepository struct {
 }
 
 //Constructor for farms repository
-func NewFarmsRepository(db *gorm.DB) domains.FarmsRepository {
-	return &FarmsRepository{db}
+func NewFarmsRepository(conn *gorm.DB) domains.FarmsRepository {
+	return &FarmsRepository{conn: conn}
 }
 
 //Ceate new farm repository

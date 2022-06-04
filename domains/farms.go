@@ -17,3 +17,10 @@ type FarmsRepository interface {
 	Get(id uint) (Farms, error)
 	GetAll() ([]Farms, error)
 }
+
+type FarmsService interface {
+	Create(farm *Farms) error
+	Delete(farm *Farms) error
+	Get(id uint) (Farms, error)
+	GetAll() ([]Farms, error)
+}
