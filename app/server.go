@@ -1,20 +1,20 @@
 package main
 
 import (
-	// "clean-arch-2/alamat"
-	// "clean-arch-2/config"
-	// "clean-arch-2/daerah"
-	// "clean-arch-2/handlers"
-	// "clean-arch-2/kategori"
-	// "clean-arch-2/keranjang"
-	// "clean-arch-2/middlewares"
-	// "clean-arch-2/pesanan"
-	// "clean-arch-2/produk"
-	// "clean-arch-2/role"
-	// "clean-arch-2/user"
+	// "delos-farm-backend/alamat"
+	// "delos-farm-backend/config"
+	// "delos-farm-backend/daerah"
+	// "delos-farm-backend/handlers"
+	// "delos-farm-backend/kategori"
+	// "delos-farm-backend/keranjang"
+	"delos-farm-backend/middlewares"
+	// "delos-farm-backend/pesanan"
+	// "delos-farm-backend/produk"
+	// "delos-farm-backend/role"
+	// "delos-farm-backend/user"
 	// "github.com/gin-contrib/cors"
-	// "github.com/gin-gonic/gin"
-	// "os"
+	"github.com/gin-gonic/gin"
+	"os"
 	"github.com/joho/godotenv"
 	"fmt"
 	"delos-farm-backend/bootstrap"
@@ -34,9 +34,8 @@ func main() {
 	}
 	
 	//init router
-	// engine := gin.Default()
-	// engine.Use(middlewares.CorsMiddleware())
-	// router := config.NewRouter(engine)
+	engine := gin.Default()
+	engine.Use(middlewares.CorsMiddleware())
 	// router.Gin.Static("/public/images/users", "./public/images/users")
 	// router.Gin.Static("/public/images/products", "./public/images/products")
 	
@@ -126,5 +125,6 @@ func main() {
 	// 	pesananHandler,
 	// ).Setup()
 
-	// router.Gin.Run(":" + os.Getenv("PORT"))
+	//run server
+	engine.Run(os.Getenv("PORT"))
 }
