@@ -5,6 +5,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"os"
+	"delos-farm-backend/domains"
 )
 
 func InitDB() (*gorm.DB, error) {
@@ -24,10 +25,11 @@ func InitDB() (*gorm.DB, error) {
 		return nil, error
 	}
 
-	fmt.Println("Successfully connected to database!")
+	fmt.Println("Successfully connected to datøabase!")
 
 	err := db.AutoMigrate(
-
+		&domains.Farms{},
+		&domains.Ponds{},
 	);
 
 	return db, err
