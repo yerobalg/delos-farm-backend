@@ -5,10 +5,13 @@ import (
 )
 
 type Farms struct {
-	gorm.Model
-	Name string `json:"name" gorm:"type:varchar(255);column:name;not null"`
-	Slug string `json:"slug" gorm:"type:varchar(255);column:slug;unique;not null"`
-	Ponds []Ponds `json:"ponds" gorm:"foreignkey:FarmID;constraint:OnDelete:CASCADE"`
+	ID        uint           `gorm:"primary_key" json:"id"`
+	CreatedAt int64          `json:"created_at"`
+	UpdatedAt int64          `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	Name      string         `json:"name" gorm:"type:varchar(255);column:name;not null"`
+	Slug      string         `json:"slug" gorm:"type:varchar(255);column:slug;unique;not null"`
+	Ponds     []Ponds        `json:"ponds" gorm:"foreignkey:FarmID;constraint:OnDelete:CASCADE"`
 }
 
 type FarmsInput struct {
@@ -30,4 +33,3 @@ type FarmsRepository interface {
 	Get(id uint) (Farms, error)
 	GetAll(limit int, offset int) ([]Farms, error)
 }
-

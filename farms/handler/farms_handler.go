@@ -7,6 +7,7 @@ import (
 	"github.com/gosimple/slug"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type FarmsHandler struct {
@@ -40,8 +41,10 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 
 	//create farm entity
 	farm := domains.Farms{
-		Name: input.Name,
-		Slug: slug.Make(input.Name),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+		Name:      input.Name,
+		Slug:      slug.Make(input.Name),
 	}
 
 	//Create the farm, and will return error if insert duplicate name
@@ -154,6 +157,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 
 	farm.Name = input.Name
 	farm.Slug = slug.Make(input.Name)
+	farm.UpdatedAt = time.Now().Unix()
 
 	//Update farm, and will return error if insert duplicate name
 	if err := h.service.Update(&farm); err != nil {
@@ -190,7 +194,7 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 	}
 
 	//get the farms, and will return error if not found
-	farms, err := h.service.GetAll(limit, offset)
+	_, err := h.service.GetAll(limit, offset)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "No farms found" {
@@ -204,6 +208,6 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, helpers.ResponseFormat(
 		"Successfully retrieved farms",
 		true,
-		farms,
+		time.Now().Unix(),
 	))
 }
