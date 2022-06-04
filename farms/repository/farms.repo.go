@@ -30,3 +30,20 @@ func (r *FarmsRepository) Get(id uint) (*domains.Farms, error) {
 	err := r.conn.First(&farm, id).Error
 	return &farm, err
 }
+
+ //get all farms repository
+func (r *FarmsRepository) GetAll(
+	limit int, 
+	offset int,
+) ([]domains.Farms, int64, error) {
+	var farms []domains.Farms
+	var totalData int64
+	
+	if err := r.conn.Limit(limit).Offset(offset).Find(&farms).Error; 
+	err != nil {
+		return nil, -1, err
+	}
+
+	r.conn.Model(&domains.Farms{}).Count(&totalData)
+	return farms, totalData, nil
+}
