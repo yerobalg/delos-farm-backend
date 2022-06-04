@@ -13,5 +13,7 @@ type Farms struct {
 
 type FarmsRepository interface {
 	Create(farm *Farms) error
-	
+	Delete(farm *Farms) error
+	Get(id uint) (Farms, error)
+	GetAll() ([]Farms, error)
 }
