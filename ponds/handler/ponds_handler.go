@@ -178,3 +178,36 @@ func (h *PondsHandler) Update(c *gin.Context) {
 		pond,
 	))
 }
+
+//Get all ponds
+func (h *PondsHandler) GetAll(c *gin.Context) {
+	//Get query params
+	limit, isLimitExist := c.GetQuery("limit")
+	offset, isOffsetExist := c.GetQuery("offset")
+
+	//the default for limit is 100 and offset is 0
+	if !isLimitExist {
+		limit = "100"
+	}
+	if !isOffsetExist {
+		offset = "0"
+	}
+
+	//get the ponds, and will return error if not found
+	_, err := h.service.GetAll(limit, offset)
+	if err != nil {
+		statusCode := http.StatusInternalServerError
+		if err.Error() == "No ponds found" {
+			statusCode = http.StatusNotFound
+		}
+
+		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		return
+	}
+
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
+		"Successfully retrieved ponds",
+		true,
+		time.Now().Unix(),
+	))
+}
