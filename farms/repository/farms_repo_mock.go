@@ -53,8 +53,8 @@ func (r *FarmsRepositoryMock) GetAll(
 	args := r.Mock.Called(limit, offset)
 	farms := args.Get(0).([]domains.Farms)
 
-	if args.Get(1) != nil && len(farms) == 0 {
-		return nil, args.Get(1).(error)
+	if len(farms) == 0 {
+		return []domains.Farms{}, nil
 	}
 
 	return farms, nil

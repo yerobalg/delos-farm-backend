@@ -53,8 +53,8 @@ func (r *PondsRepositoryMock) GetAll(
 	args := r.Mock.Called(limit, offset)
 	ponds := args.Get(0).([]domains.Ponds)
 
-	if args.Get(1) != nil && len(ponds) == 0 {
-		return nil, args.Get(1).(error)
+	if len(ponds) == 0 {
+		return []domains.Ponds{}, nil
 	}
 
 	return ponds, nil

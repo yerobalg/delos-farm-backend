@@ -102,26 +102,24 @@ func TestFarmsService_UpdateAlreadyExists(t *testing.T) {
 	assert.NotNil(t, err, "should return farm already exists error")
 }
 
-
-func TestFarmsService_GetAll(t *testing.T) {
+func TestFarmsService_GetAllSuccess(t *testing.T) {
 	limit := "2"
-	offset := "1"
-	farmRepository.Mock.On("GetAll", 2, 1).Return(Farms, nil)
+	offset := "0"
+	farmRepository.Mock.On("GetAll", 2, 0).Return(Farms, nil)
 
 	farms, err := farmService.GetAll(limit, offset)
 	assert.Nil(t, err, "should not return error")
 	assert.NotNil(t, farms, "Farms should exist")
-	assert.Equal(t, len(Farms), len(farms), "Must contain 2 farms")
+	assert.Equal(t, len(Farms), len(farms), "Must return 2 farms")
 }
 
 func TestFarmsService_GetAllNoData(t *testing.T) {
 	limit := "2"
 	offset := "5"
-	farmRepository.Mock.On("GetAll", 2, 5).Return(
-		[]domains.Farms{}, 
-		errors.New("No Farms found"),
-	)
+	farmRepository.Mock.On("GetAll", 2, 5).Return([]domains.Farms{}, nil)
+
 	farm, err := farmService.GetAll(limit, offset)
-	assert.NotNil(t, err, "Should return error")
+
+	assert.NotNil(t, err, "Should not return no farms found error")
 	assert.Equal(t, 0, len(farm), "Must contain 0 farms")
 }

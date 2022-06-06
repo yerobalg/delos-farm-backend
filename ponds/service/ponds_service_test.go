@@ -105,3 +105,32 @@ func TestPondsService_UpdateAlreadyExists(t *testing.T) {
 
 	assert.NotNil(t, err, "should return pond already exists error")
 }
+
+func TestPondsService_DeleteSuccess(t *testing.T) {
+	pondRepository.Mock.On("Delete", &Ponds[0]).Return(nil)
+
+	err := pondService.Delete(&Ponds[0])
+	assert.Nil(t, err, "should not return error")
+}
+
+func TestPondsService_GetAllSuccess(t *testing.T) {
+	limit := "2"
+	offset := "0"
+	pondRepository.Mock.On("GetAll", 2, 0).Return(Ponds, nil)
+
+	ponds, err := pondService.GetAll(limit, offset)
+	assert.Nil(t, err, "should not return error")
+	assert.NotNil(t, ponds, "Ponds should exist")
+	assert.Equal(t, len(Ponds), len(ponds), "Must return 2 ponds")
+}
+
+func TestPondsService_GetAllNoData(t *testing.T) {
+	limit := "2"
+	offset := "5"
+	pondRepository.Mock.On("GetAll", 2, 5).Return([]domains.Ponds{}, nil)
+
+	ponds, err := pondService.GetAll(limit, offset)
+	
+	assert.NotNil(t, err, "should return no ponds found error")
+	assert.Equal(t, 0, len(ponds), "Must return 0 ponds")
+}
