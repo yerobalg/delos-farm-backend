@@ -46,4 +46,41 @@ func TestPondsService_GetNotFound(t *testing.T) {
 	assert.True(t, isPondEmpty, "Pond object should be empty")
 }
 
+func TestPondsService_CreateSuccess(t *testing.T) {
+	newPond := &domains.Ponds{
+		ID:     3,
+		Name:   "Pond 3",
+		Slug:   "pond_3",
+		FarmID: 1,
+	}
+	pondRepository.Mock.On("Create", newPond).Return(nil)
+
+	err := pondService.Create(newPond)
+	assert.Nil(t, err, "should not return error")
+}
+
+func TestPondsService_CreateDuplicate(t *testing.T) {
+	pondRepository.Mock.On("Create", &Ponds[0]).Return(
+		errors.New("Pond already exists"),
+	)
+
+	err := pondService.Create(&Ponds[0])
+	assert.NotNil(t, err, "should return pond already exists error")
+}
+
+func TestPondsService_CreateFarmNotFound(t *testing.T) {
+	newPond := &domains.Ponds{
+		ID:     3,
+		Name:   "Pond 3",
+		Slug:   "pond_3",
+		FarmID: 3,
+	}
+	pondRepository.Mock.On("Create", newPond).Return(
+		errors.New("Farm not found"),
+	)
+
+	err := pondService.Create(newPond)
+	assert.NotNil(t, err, "should return farm not found error")
+}
+
 
