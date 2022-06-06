@@ -11,7 +11,7 @@ type FarmsRepositoryMock struct {
 
 func (r *FarmsRepositoryMock) Get(id uint) (domains.Farms, error) {
 	args := r.Mock.Called(id)
-	if(args.Get(0) == nil && args.Get(1) != nil) {
+	if args.Get(0) == nil && args.Get(1) != nil {
 		return domains.Farms{}, args.Get(1).(error)
 	}
 
@@ -21,26 +21,38 @@ func (r *FarmsRepositoryMock) Get(id uint) (domains.Farms, error) {
 
 func (r *FarmsRepositoryMock) Create(farms *domains.Farms) error {
 	args := r.Mock.Called(farms)
-	if(args.Get(0) == nil) {
+	if args.Get(0) == nil {
 		return nil
 	}
 
 	return args.Get(0).(error)
 }
 
-func (r *FarmsRepositoryMock) Delete(farms *domains.Farms)  error {
+func (r *FarmsRepositoryMock) Delete(farms *domains.Farms) error {
 	args := r.Mock.Called(farms)
-	if(args.Get(0) == nil) {
+	if args.Get(0) == nil {
 		return nil
 	}
 
 	return args.Get(0).(error)
 }
 
-func (r *FarmsRepositoryMock) Update(farms *domains.Farms)  error {
-	panic("implement me")
+func (r *FarmsRepositoryMock) Update(farms *domains.Farms) error {
+	args := r.Mock.Called(farms)
+	if args.Get(0) == nil {
+		return nil
+	}
+
+	return args.Get(0).(error)
 }
 
 func (r *FarmsRepositoryMock) GetAll(limit int, offset int) ([]domains.Farms, error) {
-	panic("implement me")
+	args := r.Mock.Called(limit, offset)
+	farms := args.Get(0).([]domains.Farms)
+
+	if args.Get(1) != nil && len(farms) == 0 {
+		return nil, args.Get(1).(error)
+	}
+
+	return farms, nil
 }

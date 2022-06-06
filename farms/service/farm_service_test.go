@@ -81,4 +81,23 @@ func TestCategoryService_Delete(t *testing.T) {
 	assert.Nil(t, err, "should not return error")
 }
 
+func TestCategoryService_UpdateSuccess(t *testing.T) {
+	updatedFarm := &domains.Farms{
+		ID:   2,
+		Name: "Farm 2 Updated",
+		Slug: "farm_2_updated",
+	}
+	farmRepository.Mock.On("Update", updatedFarm).Return(nil)
 
+	err := farmService.Update(updatedFarm)
+	assert.Nil(t, err, "should not return error")
+}
+
+func TestCategoryService_UpdateAlreadyExists(t *testing.T) {
+	farmRepository.Mock.On("Update", &Farms[0]).Return(
+		errors.New("Farm already exists"),
+	)
+
+	err := farmService.Update(&Farms[0])
+	assert.NotNil(t, err, "should return farm already exists error")
+}
