@@ -19,7 +19,7 @@ var Farms = []domains.Farms{
 var farmRepository = &repository.FarmsRepositoryMock{Mock: mock.Mock{}}
 var farmService = NewFarmsService(farmRepository)
 
-func TestCategoryService_GetFound(t *testing.T) {
+func TestFarmsService_GetFound(t *testing.T) {
 	farmRepository.Mock.On("Get", uint(1)).Return(Farms[0], nil)
 
 	farm, err := farmService.Get(uint(1))
@@ -34,7 +34,7 @@ func TestCategoryService_GetFound(t *testing.T) {
 	)
 }
 
-func TestCategoryService_GetNotFound(t *testing.T) {
+func TestFarmsService_GetNotFound(t *testing.T) {
 	farmRepository.Mock.On("Get", uint(3)).Return(
 		nil, errors.New("Farm not found"),
 	)
@@ -46,7 +46,7 @@ func TestCategoryService_GetNotFound(t *testing.T) {
 	assert.True(t, isFarmEmpty, "Farm object should be empty")
 }
 
-func TestCategoryService_CreateSuccess(t *testing.T) {
+func TestFarmsService_CreateSuccess(t *testing.T) {
 	newFarm := &domains.Farms{
 		ID:   3,
 		Name: "Farm 3",
@@ -58,7 +58,7 @@ func TestCategoryService_CreateSuccess(t *testing.T) {
 	assert.Nil(t, err, "should not return error")
 }
 
-func TestCategoryService_CreateDuplicate(t *testing.T) {
+func TestFarmsService_CreateDuplicate(t *testing.T) {
 	farmRepository.Mock.On("Create", &Farms[0]).Return(
 		errors.New("Farm already exists"),
 	)
@@ -67,21 +67,21 @@ func TestCategoryService_CreateDuplicate(t *testing.T) {
 	assert.NotNil(t, err, "should return farm already exists error")
 }
 
-func TestCategoryService_DeleteSuccess(t *testing.T) {
+func TestFarmsService_DeleteSuccess(t *testing.T) {
 	farmRepository.Mock.On("Delete", &Farms[0]).Return(nil)
 
 	err := farmService.Delete(&Farms[0])
 	assert.Nil(t, err, "should not return error")
 }
 
-func TestCategoryService_Delete(t *testing.T) {
+func TestFarmsService_Delete(t *testing.T) {
 	farmRepository.Mock.On("Delete", &Farms[0]).Return(nil)
 
 	err := farmService.Delete(&Farms[0])
 	assert.Nil(t, err, "should not return error")
 }
 
-func TestCategoryService_UpdateSuccess(t *testing.T) {
+func TestFarmsService_UpdateSuccess(t *testing.T) {
 	updatedFarm := &domains.Farms{
 		ID:   2,
 		Name: "Farm 2 Updated",
@@ -93,7 +93,7 @@ func TestCategoryService_UpdateSuccess(t *testing.T) {
 	assert.Nil(t, err, "should not return error")
 }
 
-func TestCategoryService_UpdateAlreadyExists(t *testing.T) {
+func TestFarmsService_UpdateAlreadyExists(t *testing.T) {
 	farmRepository.Mock.On("Update", &Farms[0]).Return(
 		errors.New("Farm already exists"),
 	)
@@ -103,7 +103,7 @@ func TestCategoryService_UpdateAlreadyExists(t *testing.T) {
 }
 
 
-func TestCategoryService_GetAll(t *testing.T) {
+func TestFarmsService_GetAll(t *testing.T) {
 	limit := "2"
 	offset := "1"
 	farmRepository.Mock.On("GetAll", 2, 1).Return(Farms, nil)
@@ -114,7 +114,7 @@ func TestCategoryService_GetAll(t *testing.T) {
 	assert.Equal(t, len(Farms), len(farms), "Must contain 2 farms")
 }
 
-func TestCategoryService_GetAllNoData(t *testing.T) {
+func TestFarmsService_GetAllNoData(t *testing.T) {
 	limit := "2"
 	offset := "5"
 	farmRepository.Mock.On("GetAll", 2, 5).Return(

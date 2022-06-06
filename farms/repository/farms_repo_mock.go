@@ -46,7 +46,10 @@ func (r *FarmsRepositoryMock) Update(farms *domains.Farms) error {
 	return args.Get(0).(error)
 }
 
-func (r *FarmsRepositoryMock) GetAll(limit int, offset int) ([]domains.Farms, error) {
+func (r *FarmsRepositoryMock) GetAll(
+	limit int,
+	offset int,
+) ([]domains.Farms, error) {
 	args := r.Mock.Called(limit, offset)
 	farms := args.Get(0).([]domains.Farms)
 
