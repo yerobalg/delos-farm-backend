@@ -29,7 +29,12 @@ func (r *FarmsRepositoryMock) Create(farms *domains.Farms) error {
 }
 
 func (r *FarmsRepositoryMock) Delete(farms *domains.Farms)  error {
-	panic("implement me")
+	args := r.Mock.Called(farms)
+	if(args.Get(0) == nil) {
+		return nil
+	}
+
+	return args.Get(0).(error)
 }
 
 func (r *FarmsRepositoryMock) Update(farms *domains.Farms)  error {
