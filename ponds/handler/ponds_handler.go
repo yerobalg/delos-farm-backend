@@ -2,6 +2,7 @@ package handler
 
 import (
 	"delos-farm-backend/domains"
+	"delos-farm-backend/middlewares"
 	"delos-farm-backend/helpers"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
@@ -14,15 +15,19 @@ type PondsHandler struct {
 	service domains.PondsService
 }
 
-func NewPondsHandler(r *gin.RouterGroup, service domains.PondsService) {
+func NewPondsHandler(
+	r *gin.RouterGroup, 
+	service domains.PondsService,
+	statsMiddleware middlewares.StatsMiddleware,
+) {
 	handler := &PondsHandler{service: service}
 	api := r.Group("/ponds")
 	{
-		api.POST("/:farmId", handler.Create)
-		api.DELETE("/:id", handler.Delete)
-		api.GET("/:id", handler.Get)
-		api.GET("/", handler.GetAll)
-		api.PUT("/:id", handler.Update)
+		api.POST("/:farmId",statsMiddleware.GetStatistics(), handler.Create)
+		api.DELETE("/:id",statsMiddleware.GetStatistics(), handler.Delete)
+		api.GET("/:id",statsMiddleware.GetStatistics(), handler.Get)
+		api.GET("/",statsMiddleware.GetStatistics(), handler.GetAll)
+		api.PUT("/:id",statsMiddleware.GetStatistics(), handler.Update)
 	}
 }
 
@@ -36,6 +41,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 			"Invalid farm id",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -47,6 +53,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -74,6 +81,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -82,6 +90,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		"Successfully created pond",
 		true,
 		pond,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -98,6 +107,7 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 			"Pond not found",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -108,6 +118,7 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 			"Failed to delete pond",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -116,6 +127,7 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 		"Successfully deleted pond",
 		true,
 		nil,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -132,6 +144,7 @@ func (h *PondsHandler) Get(c *gin.Context) {
 			"Pond not found",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -140,6 +153,7 @@ func (h *PondsHandler) Get(c *gin.Context) {
 		"Successfully retrieved pond",
 		true,
 		pond,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -152,9 +166,11 @@ func (h *PondsHandler) Update(c *gin.Context) {
 	//Find pond by id, if not found return error
 	pond, err := h.service.Get(uint(idNum))
 	if err != nil && err.Error() == "Pond not found" {
-		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Pond not found",
+		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
+			"Pond not found",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -166,6 +182,7 @@ func (h *PondsHandler) Update(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -183,7 +200,12 @@ func (h *PondsHandler) Update(c *gin.Context) {
 			statusCode = http.StatusConflict
 		}
 
-		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		c.JSON(statusCode, helpers.ResponseFormat(
+			err.Error(), 
+			false, 
+			nil,
+			c.MustGet("stats").(domains.Stats),
+		))
 		return
 	}
 
@@ -191,6 +213,7 @@ func (h *PondsHandler) Update(c *gin.Context) {
 		"Successfully updated pond",
 		true,
 		pond,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -216,7 +239,12 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 			statusCode = http.StatusNotFound
 		}
 
-		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		c.JSON(statusCode, helpers.ResponseFormat(
+			err.Error(), 
+			false, 
+			nil,
+			c.MustGet("stats").(domains.Stats),
+		))
 		return
 	}
 
@@ -224,5 +252,6 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 		"Successfully retrieved ponds",
 		true,
 		ponds,
+		c.MustGet("stats").(domains.Stats),
 	))
 }

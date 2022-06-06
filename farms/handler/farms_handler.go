@@ -3,6 +3,7 @@ package handler
 import (
 	"delos-farm-backend/domains"
 	"delos-farm-backend/helpers"
+	"delos-farm-backend/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"net/http"
@@ -14,15 +15,19 @@ type FarmsHandler struct {
 	service domains.FarmsService
 }
 
-func NewFarmsHandler(r *gin.RouterGroup, service domains.FarmsService) {
+func NewFarmsHandler(
+	r *gin.RouterGroup,
+	service domains.FarmsService,
+	statsMiddleware middlewares.StatsMiddleware,
+) {
 	handler := &FarmsHandler{service: service}
 	api := r.Group("/farms")
 	{
-		api.POST("/", handler.Create)
-		api.DELETE("/:id", handler.Delete)
-		api.GET("/:id", handler.Get)
-		api.GET("/", handler.GetAll)
-		api.PUT("/:id", handler.Update)
+		api.POST("/", statsMiddleware.GetStatistics(), handler.Create)
+		api.DELETE("/:id", statsMiddleware.GetStatistics(), handler.Delete)
+		api.GET("/:id", statsMiddleware.GetStatistics(), handler.Get)
+		api.GET("/", statsMiddleware.GetStatistics(), handler.GetAll)
+		api.PUT("/:id", statsMiddleware.GetStatistics(), handler.Update)
 	}
 }
 
@@ -35,6 +40,7 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -59,6 +65,7 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -67,6 +74,7 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 		"Successfully created farm",
 		true,
 		farm,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -83,6 +91,7 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 			"Farm not found",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -93,6 +102,7 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 			"Failed to delete farm",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -101,6 +111,7 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 		"Successfully deleted farm",
 		true,
 		nil,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -117,6 +128,7 @@ func (h *FarmsHandler) Get(c *gin.Context) {
 			"Farm not found",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -125,6 +137,7 @@ func (h *FarmsHandler) Get(c *gin.Context) {
 		"Successfully retrieved farm",
 		true,
 		farm,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -140,6 +153,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Farm not found",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -151,6 +165,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
+			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -168,7 +183,12 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 			statusCode = http.StatusConflict
 		}
 
-		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		c.JSON(statusCode, helpers.ResponseFormat(
+			err.Error(),
+			false,
+			nil,
+			c.MustGet("stats").(domains.Stats),
+		))
 		return
 	}
 
@@ -176,6 +196,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 		"Successfully updated farm",
 		true,
 		farm,
+		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -201,7 +222,12 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 			statusCode = http.StatusNotFound
 		}
 
-		c.JSON(statusCode, helpers.ResponseFormat(err.Error(), false, nil))
+		c.JSON(statusCode, helpers.ResponseFormat(
+			err.Error(),
+			false,
+			nil,
+			c.MustGet("stats").(domains.Stats),
+		))
 		return
 	}
 
@@ -209,5 +235,6 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 		"Successfully retrieved farms",
 		true,
 		farms,
+		c.MustGet("stats").(domains.Stats),
 	))
 }

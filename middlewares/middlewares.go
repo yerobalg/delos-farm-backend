@@ -1,20 +1,19 @@
 package middlewares
 
 import (
-	"context"
 	"delos-farm-backend/domains"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 )
-
-type Middleware struct{}
 
 func CorsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, authorization, accept, origin, Cache-Control, X-Requested-With, user-info")
+		c.Writer.Header().Set(
+			"Access-Control-Allow-Headers", 
+			"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, authorization, accept, origin, Cache-Control, X-Requested-With, user-info",
+		)
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		if c.Request.Method == "OPTIONS" {
 			c.Writer.Header().Set("Content-Type", "application/json")
@@ -25,32 +24,26 @@ func CorsMiddleware() gin.HandlerFunc {
 	}
 }
 
-func StatsMiddleware(redisClient *redis.Client) gin.HandlerFunc {
+type StatsMiddleware struct{
+	service domains.StatsService
+}
+
+func NewStatsMiddleware(service domains.StatsService) StatsMiddleware {
+	return StatsMiddleware{service: service}
+}
+
+func (m StatsMiddleware) GetStatistics() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		apiCountKey := c.Request.Method + "_" + c.Request.URL.Path
-		uniqueCallCountKey := "ip_" + c.ClientIP()
+		//get ip address
+		ip := c.ClientIP()
 
-		apiCountRes, err := redisClient.Incr(
-			context.Background(), apiCountKey,
-		).Result()
-		if err != nil {
-			c.Next()
-			return
-		}
+		//get path
+		path := c.Request.URL.Path
 
-		uniqueCallCountRes, err := redisClient.Incr(
-			context.Background(), uniqueCallCountKey,
-		).Result()
-		if err != nil {
-			c.Next()
-			return
-		}
+		//get statistics from service
+		stats := m.service.GetStatistics(path, ip)
 
-		stats := domains.Stats{
-			APICount: apiCountRes,
-			UniqueCallCount: uniqueCallCountRes,
-		}
-
+		//set statistics to context
 		c.Set("stats", stats)
 	}
 }
