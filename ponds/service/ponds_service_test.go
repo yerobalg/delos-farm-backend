@@ -12,8 +12,8 @@ import (
 )
 
 var Ponds = []domains.Ponds{
-	{ID: 1, Name: "Farm 1", Slug: "farm_1", FarmID: 1},
-	{ID: 2, Name: "Farm 2", Slug: "farm_2", FarmID: 1},
+	{ID: 1, Name: "Farm 1", Slug: "1_farm_1", FarmID: 1},
+	{ID: 2, Name: "Farm 2", Slug: "1_farm_2", FarmID: 1},
 }
 
 var pondRepository = &repository.PondsRepositoryMock{Mock: mock.Mock{}}
@@ -83,4 +83,25 @@ func TestPondsService_CreateFarmNotFound(t *testing.T) {
 	assert.NotNil(t, err, "should return farm not found error")
 }
 
+func TestPondsService_UpdateSuccess(t *testing.T) {
+	updatedPond := &domains.Ponds{
+		ID:     3,
+		Name:   "Pond 3",
+		Slug:   "1_pond_3",
+		FarmID: 1,
+	}
+	pondRepository.Mock.On("Update", updatedPond).Return(nil)
 
+	err := pondService.Update(updatedPond)
+	assert.Nil(t, err, "should not return error")
+}
+
+func TestPondsService_UpdateAlreadyExists(t *testing.T) {
+	pondRepository.Mock.On("Update", &Ponds[0]).Return(
+		errors.New("Pond already exists"),
+	)
+
+	err := pondService.Update(&Ponds[0])
+
+	assert.NotNil(t, err, "should return pond already exists error")
+}

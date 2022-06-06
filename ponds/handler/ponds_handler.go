@@ -2,8 +2,8 @@ package handler
 
 import (
 	"delos-farm-backend/domains"
-	"delos-farm-backend/middlewares"
 	"delos-farm-backend/helpers"
+	"delos-farm-backend/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"net/http"
@@ -16,18 +16,18 @@ type PondsHandler struct {
 }
 
 func NewPondsHandler(
-	r *gin.RouterGroup, 
+	r *gin.RouterGroup,
 	service domains.PondsService,
 	statsMiddleware middlewares.StatsMiddleware,
 ) {
 	handler := &PondsHandler{service: service}
 	api := r.Group("/ponds")
 	{
-		api.POST("/:farmId",statsMiddleware.GetStatistics(), handler.Create)
-		api.DELETE("/:id",statsMiddleware.GetStatistics(), handler.Delete)
-		api.GET("/:id",statsMiddleware.GetStatistics(), handler.Get)
-		api.GET("/",statsMiddleware.GetStatistics(), handler.GetAll)
-		api.PUT("/:id",statsMiddleware.GetStatistics(), handler.Update)
+		api.POST("/:farmId", statsMiddleware.GetStatistics(), handler.Create)
+		api.DELETE("/:id", statsMiddleware.GetStatistics(), handler.Delete)
+		api.GET("/:id", statsMiddleware.GetStatistics(), handler.Get)
+		api.GET("/", statsMiddleware.GetStatistics(), handler.GetAll)
+		api.PUT("/:id", statsMiddleware.GetStatistics(), handler.Update)
 	}
 }
 
@@ -63,7 +63,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		CreatedAt: time.Now().Unix(),
 		UpdatedAt: time.Now().Unix(),
 		Name:      input.Name,
-		Slug:      slug.Make(input.Name),
+		Slug:      farmId + "_" + slug.Make(input.Name),
 		FarmID:    uint(farmIdNum),
 	}
 
@@ -73,7 +73,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		//if error is duplicate key value and farm id not found
 		if err.Error() == "Pond already exists" {
 			statusCode = http.StatusConflict
-		} else if err.Error() == "Farm not found" { 
+		} else if err.Error() == "Farm not found" {
 			statusCode = http.StatusNotFound
 		}
 
@@ -201,8 +201,8 @@ func (h *PondsHandler) Update(c *gin.Context) {
 		}
 
 		c.JSON(statusCode, helpers.ResponseFormat(
-			err.Error(), 
-			false, 
+			err.Error(),
+			false,
 			nil,
 			c.MustGet("stats").(domains.Stats),
 		))
@@ -240,8 +240,8 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 		}
 
 		c.JSON(statusCode, helpers.ResponseFormat(
-			err.Error(), 
-			false, 
+			err.Error(),
+			false,
 			nil,
 			c.MustGet("stats").(domains.Stats),
 		))
