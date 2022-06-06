@@ -2,8 +2,8 @@ package main
 
 import (
 	"delos-farm-backend/bootstrap"
-	_statsService "delos-farm-backend/statistics/service"
-	_statsRepository "delos-farm-backend/statistics/repository"
+	_statsService "delos-farm-backend/stats/service"
+	_statsRepository "delos-farm-backend/stats/repository"
 	farmsHandler "delos-farm-backend/farms/handler"
 	_farmsRepository "delos-farm-backend/farms/repository"
 	_farmsService "delos-farm-backend/farms/service"
