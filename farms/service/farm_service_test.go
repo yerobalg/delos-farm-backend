@@ -101,3 +101,27 @@ func TestCategoryService_UpdateAlreadyExists(t *testing.T) {
 	err := farmService.Update(&Farms[0])
 	assert.NotNil(t, err, "should return farm already exists error")
 }
+
+
+func TestCategoryService_GetAll(t *testing.T) {
+	limit := "2"
+	offset := "1"
+	farmRepository.Mock.On("GetAll", 2, 1).Return(Farms, nil)
+
+	farms, err := farmService.GetAll(limit, offset)
+	assert.Nil(t, err, "should not return error")
+	assert.NotNil(t, farms, "Farms should exist")
+	assert.Equal(t, len(Farms), len(farms), "Must contain 2 farms")
+}
+
+func TestCategoryService_GetAllNoData(t *testing.T) {
+	limit := "2"
+	offset := "5"
+	farmRepository.Mock.On("GetAll", 2, 5).Return(
+		[]domains.Farms{}, 
+		errors.New("No Farms found"),
+	)
+	farm, err := farmService.GetAll(limit, offset)
+	assert.NotNil(t, err, "Should return error")
+	assert.Equal(t, 0, len(farm), "Must contain 0 farms")
+}
