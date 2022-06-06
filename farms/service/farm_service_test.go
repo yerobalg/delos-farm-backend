@@ -11,7 +11,10 @@ import (
 	"testing"
 )
 
-var Farms = []domains.Farms{{ID: 1, Name: "Farm 1"}, {ID: 2, Name: "Farm 2"}}
+var Farms = []domains.Farms{
+	{ID: 1, Name: "Farm 1", Slug: "farm_1"},
+	{ID: 2, Name: "Farm 2", Slug: "farm_2"},
+}
 
 var farmRepository = &repository.FarmsRepositoryMock{Mock: mock.Mock{}}
 var farmService = NewFarmsService(farmRepository)
@@ -42,3 +45,26 @@ func TestCategoryService_GetNotFound(t *testing.T) {
 	isFarmEmpty := reflect.DeepEqual(domains.Farms{}, farm)
 	assert.True(t, isFarmEmpty, "Farm object should be empty")
 }
+
+func TestCategoryService_CreateSuccess(t *testing.T) {
+	newFarm := &domains.Farms{
+		ID:   3,
+		Name: "Farm 3",
+		Slug: "farm_3",
+	}
+	farmRepository.Mock.On("Create", newFarm).Return(nil)
+
+	err := farmService.Create(newFarm)
+	assert.Nil(t, err, "should not return error")
+}
+
+func TestCategoryService_CreateDuplicate(t *testing.T) {
+	farmRepository.Mock.On("Create", &Farms[0]).Return(
+		errors.New("Farm already exists"),
+	)
+
+	err := farmService.Create(&Farms[0])
+	assert.NotNil(t, err, "should return farm already exists error")
+}
+
+
