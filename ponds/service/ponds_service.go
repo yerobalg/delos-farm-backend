@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type PondsService struct {
@@ -17,17 +18,26 @@ func NewPondsService(repo domains.PondsRepository) domains.PondsService {
 }
 
 //Create new pond service
-func (s *PondsService) Create(pond *domains.Ponds) error {
+func (s *PondsService) Create(
+	name string, 
+	slug string,
+	farmId uint,
+) (*domains.Ponds, error) {
+	pond := &domains.Ponds{
+		Name: name,
+		Slug: slug,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+		FarmID: farmId,
+	}
 	err := s.repo.Create(pond)
 	if err == nil {
-		return nil
+		return pond, nil
 	}
 	if (strings.Contains(err.Error(), "duplicate key value")) {
-		return errors.New("Pond already exists")
-	} else if(strings.Contains(err.Error(), "violates foreign key")) {
-		return errors.New("Farm not found")
+		return nil, errors.New("Pomd already exists")
 	}
-	return err	
+	return nil, err	
 }
 
 //Delete pond service

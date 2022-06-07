@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 type PondsHandler struct {
@@ -56,17 +57,15 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		return
 	}
 
-	//create pond entity
-	pond := domains.Ponds{
-		CreatedAt: time.Now().Unix(),
-		UpdatedAt: time.Now().Unix(),
-		Name:      input.Name,
-		Slug:      farmId + "_" + slug.Make(input.Name),
-		FarmID:    uint(farmIdNum),
-	}
 
 	//Create the pond, and will return error if insert duplicate name
-	if err := h.service.Create(&pond); err != nil {
+	pond, err := h.service.Create(
+		input.Name,
+		fmt.Sprintf("%s_%s", farmId, slug.Make(input.Name)),
+		uint(farmIdNum),
+	)
+
+	if err != nil {
 		statusCode := http.StatusInternalServerError
 		//if error is duplicate key value and farm id not found
 		if err.Error() == "Pond already exists" {

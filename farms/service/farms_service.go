@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type FarmsService struct {
@@ -17,15 +18,24 @@ func NewFarmsService(repo domains.FarmsRepository) domains.FarmsService {
 }
 
 //Create new farm service
-func (s *FarmsService) Create(farm *domains.Farms) error {
+func (s *FarmsService) Create(
+	name string, 
+	slug string,
+) (*domains.Farms, error) {
+	farm := &domains.Farms{
+		Name: name,
+		Slug: slug,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	}
 	err := s.repo.Create(farm)
 	if err == nil {
-		return nil
+		return farm, nil
 	}
 	if (strings.Contains(err.Error(), "duplicate key value")) {
-		return errors.New("Farm already exists")
+		return nil, errors.New("Farm already exists")
 	}
-	return err	
+	return nil, err	
 }
 
 //Delete farm service

@@ -19,7 +19,7 @@ type FarmsInput struct {
 }
 
 type FarmsService interface {
-	Create(farm *Farms) error
+	Create(name string, slug string) (*Farms, error)
 	Delete(farm *Farms) error
 	Update(farm *Farms) error
 	Get(id uint) (Farms, error)

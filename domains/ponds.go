@@ -20,7 +20,7 @@ type PondsInput struct {
 }
 
 type PondsService interface {
-	Create(pond *Ponds) error
+	Create(name string, slug string, farmId uint) (*Ponds, error)
 	Delete(pond *Ponds) error
 	Update(pond *Ponds) error
 	Get(id uint) (Ponds, error)

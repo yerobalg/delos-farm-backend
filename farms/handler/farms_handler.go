@@ -12,15 +12,15 @@ import (
 )
 
 type FarmsHandler struct {
-	service domains.FarmsService
+	Service domains.FarmsService
 }
 
 func NewFarmsHandler(
 	r *gin.RouterGroup,
-	service domains.FarmsService,
+	Service domains.FarmsService,
 	statsMiddleware middlewares.StatsMiddleware,
 ) {
-	handler := &FarmsHandler{service: service}
+	handler := &FarmsHandler{Service: Service}
 	api := r.Group("/farms")
 	{
 		api.POST("/", statsMiddleware.GetStatistics(), handler.Create)
@@ -45,15 +45,12 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 	}
 
 	//create farm entity
-	farm := domains.Farms{
-		CreatedAt: time.Now().Unix(),
-		UpdatedAt: time.Now().Unix(),
-		Name:      input.Name,
-		Slug:      slug.Make(input.Name),
-	}
+	name:= input.Name
+	slug:= slug.Make(name)
 
 	//Create the farm, and will return error if insert duplicate name
-	if err := h.service.Create(&farm); err != nil {
+	farm, err := h.Service.Create(name, slug);
+	if  err != nil {
 		statusCode := http.StatusInternalServerError
 		//if error is duplicate key value
 		if err.Error() == "Farm already exists" {
@@ -82,7 +79,7 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 	idNum, _ := strconv.Atoi(id)
 
 	//Find farm by id, if not found return error
-	farm, err := h.service.Get(uint(idNum))
+	farm, err := h.Service.Get(uint(idNum))
 	if err != nil && err.Error() == "Farm not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Farm not found",
@@ -93,7 +90,7 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 	}
 
 	//Delete the farm
-	if err := h.service.Delete(&farm); err != nil {
+	if err := h.Service.Delete(&farm); err != nil {
 		c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
 			"Failed to delete farm",
 			false,
@@ -116,7 +113,7 @@ func (h *FarmsHandler) Get(c *gin.Context) {
 	idNum, _ := strconv.Atoi(id)
 
 	//Find farm by id, if not found return error
-	farm, err := h.service.Get(uint(idNum))
+	farm, err := h.Service.Get(uint(idNum))
 	if err != nil && err.Error() == "Farm not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Farm not found",
@@ -140,7 +137,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 	idNum, _ := strconv.Atoi(id)
 
 	//Find farm by id, if not found return error
-	farm, err := h.service.Get(uint(idNum))
+	farm, err := h.Service.Get(uint(idNum))
 	if err != nil && err.Error() == "Farm not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Farm not found",
 			false,
@@ -165,7 +162,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 	farm.UpdatedAt = time.Now().Unix()
 
 	//Update farm, and will return error if insert duplicate name
-	if err := h.service.Update(&farm); err != nil {
+	if err := h.Service.Update(&farm); err != nil {
 		statusCode := http.StatusInternalServerError
 
 		//if error is duplicate key value
@@ -203,7 +200,7 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 	}
 
 	//get the farms, and will return error if not found
-	farms, err := h.service.GetAll(limit, offset)
+	farms, err := h.Service.GetAll(limit, offset)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "No farms found" {

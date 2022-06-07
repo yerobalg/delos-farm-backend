@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"reflect"
 	"testing"
+	"time"
+	"bou.ke/monkey"
 )
 
 var Ponds = []domains.Ponds{
@@ -47,40 +49,23 @@ func TestPondsService_GetNotFound(t *testing.T) {
 }
 
 func TestPondsService_CreateSuccess(t *testing.T) {
-	newPond := &domains.Ponds{
-		ID:     3,
-		Name:   "Pond 3",
-		Slug:   "pond_3",
+	monkey.Patch(time.Now, func() time.Time {
+		return time.Date(2009, 11, 17, 20, 34, 58, 651387237, time.UTC)
+	})
+	name := "Pond 3"
+	slug := "pond_3"
+	pond := &domains.Ponds{
+		Name: name,
+		Slug: slug,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 		FarmID: 1,
 	}
-	pondRepository.Mock.On("Create", newPond).Return(nil)
+	pondRepository.Mock.On("Create", pond).Return(nil)
 
-	err := pondService.Create(newPond)
+	pond, err := pondService.Create(name, slug, 1)
 	assert.Nil(t, err, "should not return error")
-}
-
-func TestPondsService_CreateDuplicate(t *testing.T) {
-	pondRepository.Mock.On("Create", &Ponds[0]).Return(
-		errors.New("Pond already exists"),
-	)
-
-	err := pondService.Create(&Ponds[0])
-	assert.NotNil(t, err, "should return pond already exists error")
-}
-
-func TestPondsService_CreateFarmNotFound(t *testing.T) {
-	newPond := &domains.Ponds{
-		ID:     3,
-		Name:   "Pond 3",
-		Slug:   "pond_3",
-		FarmID: 3,
-	}
-	pondRepository.Mock.On("Create", newPond).Return(
-		errors.New("Farm not found"),
-	)
-
-	err := pondService.Create(newPond)
-	assert.NotNil(t, err, "should return farm not found error")
+	assert.NotNil(t, pond, "Pond should exist")
 }
 
 func TestPondsService_UpdateSuccess(t *testing.T) {

@@ -9,11 +9,23 @@ import (
 	"github.com/stretchr/testify/mock"
 	"reflect"
 	"testing"
+	"time"
+	"bou.ke/monkey"
 )
 
 var Farms = []domains.Farms{
-	{ID: 1, Name: "Farm 1", Slug: "farm_1"},
-	{ID: 2, Name: "Farm 2", Slug: "farm_2"},
+	{ID: 1,
+		Name:      "Farm 1",
+		Slug:      "farm_1",
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	},
+	{ID: 2,
+		Name:      "Farm 2",
+		Slug:      "farm_2",
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
+	},
 }
 
 var farmRepository = &mocks.FarmsRepositoryMock{Mock: mock.Mock{}}
@@ -47,24 +59,22 @@ func TestFarmsService_GetNotFound(t *testing.T) {
 }
 
 func TestFarmsService_CreateSuccess(t *testing.T) {
-	newFarm := &domains.Farms{
-		ID:   3,
-		Name: "Farm 3",
-		Slug: "farm_3",
+	monkey.Patch(time.Now, func() time.Time {
+		return time.Date(2009, 11, 17, 20, 34, 58, 651387237, time.UTC)
+	})
+	name := "Farm 1"
+	slug := "farm_1"
+	farms := &domains.Farms{
+		Name:      name,
+		Slug:      slug,
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
-	farmRepository.Mock.On("Create", newFarm).Return(nil)
+	farmRepository.Mock.On("Create", farms).Return(nil)
 
-	err := farmService.Create(newFarm)
+	farm, err := farmService.Create(name, slug)
 	assert.Nil(t, err, "should not return error")
-}
-
-func TestFarmsService_CreateDuplicate(t *testing.T) {
-	farmRepository.Mock.On("Create", &Farms[0]).Return(
-		errors.New("Farm already exists"),
-	)
-
-	err := farmService.Create(&Farms[0])
-	assert.NotNil(t, err, "should return farm already exists error")
+	assert.NotNil(t, farm, "Farm should exist")
 }
 
 func TestFarmsService_DeleteSuccess(t *testing.T) {

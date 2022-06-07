@@ -19,8 +19,8 @@ func (r *FarmsRepositoryMock) Get(id uint) (domains.Farms, error) {
 	return farms, nil
 }
 
-func (r *FarmsRepositoryMock) Create(farms *domains.Farms) error {
-	args := r.Mock.Called(farms)
+func (r *FarmsRepositoryMock) Create(farm *domains.Farms) error {
+	args := r.Mock.Called(farm)
 	if args.Get(0) == nil {
 		return nil
 	}
@@ -28,8 +28,8 @@ func (r *FarmsRepositoryMock) Create(farms *domains.Farms) error {
 	return args.Get(0).(error)
 }
 
-func (r *FarmsRepositoryMock) Delete(farms *domains.Farms) error {
-	args := r.Mock.Called(farms)
+func (r *FarmsRepositoryMock) Delete(farm *domains.Farms) error {
+	args := r.Mock.Called(farm)
 	if args.Get(0) == nil {
 		return nil
 	}
@@ -37,8 +37,8 @@ func (r *FarmsRepositoryMock) Delete(farms *domains.Farms) error {
 	return args.Get(0).(error)
 }
 
-func (r *FarmsRepositoryMock) Update(farms *domains.Farms) error {
-	args := r.Mock.Called(farms)
+func (r *FarmsRepositoryMock) Update(farm *domains.Farms) error {
+	args := r.Mock.Called(farm)
 	if args.Get(0) == nil {
 		return nil
 	}

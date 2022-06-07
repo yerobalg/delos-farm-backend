@@ -3,49 +3,65 @@ package handler
 import (
 	"delos-farm-backend/domains"
 	"delos-farm-backend/domains/mocks"
+	"delos-farm-backend/helpers"
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"net/http"
 	"net/http/httptest"
-	// "encoding/json"
-	"fmt"
+	"testing"
 )
 
 var statsServicemock = new(mocks.StatsServiceMock)
+var router = gin.Default()
+var group = router.Group("api/v1")
+var statsHandler = StatsHandler{Service: statsServicemock}
 
 func TestStatsHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	t.Run("GetAllStatsSuccess", func(t *testing.T) {
-		stats := []domains.StatsResults{
-			{Path: "test 1", APICallCount: "2", UniqueCallCount: "1"},
-			{Path: "test 2", APICallCount: "2", UniqueCallCount: "1"},
-			{Path: "test 3", APICallCount: "2", UniqueCallCount: "1"},
-		}
-		limit := "10"
-		offset := "0"
+	t.Run("GetAllStatsSuccess", getAllStatsSuccess)
+}
 
-		statsServicemock.Mock.On("GetAllStats", limit, offset).Return(stats, nil)
 
-		recorder := httptest.NewRecorder()
+func getAllStatsSuccess(t *testing.T) {
+	stats := []domains.StatsResults{
+		{Path: "test 1", APICallCount: "2", UniqueCallCount: "1"},
+		{Path: "test 2", APICallCount: "2", UniqueCallCount: "1"},
+		{Path: "test 3", APICallCount: "2", UniqueCallCount: "1"},
+	}
+	limit := "10"
+	offset := "0"
 
-		router := gin.Default()
-		group := router.Group("api/v1")
+	statsServicemock.Mock.On("GetAllStats", limit, offset).Return(stats, nil)
 
-		statsHandler := StatsHandler{Service: statsServicemock}
+	group.GET("/statistics", statsHandler.GetAll)
 
-		group.GET("/statistics", statsHandler.GetAll)
+	statusCode, response := beginTestRequest(
+		"GET",
+		fmt.Sprintf("/api/v1/statistics?limit=%s&offset=%s", limit, offset),
+		t,
+	)
 
-		request, err := http.NewRequest(
-			"GET", 
-			fmt.Sprintf("/api/v1/statistics?limit=%s&offset=%s", limit, offset),
-			nil,
-		)
-		assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, statusCode)
+	assert.Equal(t, true, response.Success)
+}
 
-		router.ServeHTTP(recorder, request)
+func beginTestRequest(
+	method string,
+	url string,
+	tContext *testing.T,
+) (int, helpers.Response) {
+	recorder := httptest.NewRecorder()
 
-		assert.Equal(t, http.StatusOK, recorder.Code)
-	})
+	request, err := http.NewRequest(method, url, nil)
+	assert.NoError(tContext, err)
+
+	router.ServeHTTP(recorder, request)
+	res := recorder.Result().Body
+	defer res.Close()
+	response := helpers.Response{}
+	json.NewDecoder(res).Decode(&response)
+	return recorder.Code, response
 }
