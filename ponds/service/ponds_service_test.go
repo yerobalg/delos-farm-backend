@@ -2,7 +2,7 @@ package service
 
 import (
 	"delos-farm-backend/domains"
-	"delos-farm-backend/ponds/repository"
+	"delos-farm-backend/domains/mocks"
 	"errors"
 	"fmt"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +16,7 @@ var Ponds = []domains.Ponds{
 	{ID: 2, Name: "Farm 2", Slug: "1_farm_2", FarmID: 1},
 }
 
-var pondRepository = &repository.PondsRepositoryMock{Mock: mock.Mock{}}
+var pondRepository = &mocks.PondsRepositoryMock{Mock: mock.Mock{}}
 var pondService = NewPondsService(pondRepository)
 
 func TestPondsService_GetFound(t *testing.T) {

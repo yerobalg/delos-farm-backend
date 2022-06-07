@@ -8,20 +8,30 @@ import (
 )
 
 type StatsHandler struct {
-	service domains.StatsService
+	Service domains.StatsService
 }
 
-func NewStatsHandler(r *gin.RouterGroup, service domains.StatsService,) {
-	handler := &StatsHandler{service: service}
+func NewStatsHandler(r *gin.RouterGroup, Service domains.StatsService,) {
+	handler := &StatsHandler{Service: Service}
 	api := r.Group("/statistics")
 	api.GET("/", handler.GetAll)
 }
 
 func (h *StatsHandler) GetAll(c *gin.Context) {
-	limit := c.Query("limit")
-	offset := c.Query("offset")
+	//Get query params
+	limit, isLimitExist := c.GetQuery("limit")
+	offset, isOffsetExist := c.GetQuery("offset")
 
-	statistics, err := h.service.GetAllStats(limit, offset)
+	//the default for limit is 100 and offset is 0
+	if !isLimitExist {
+		limit = "100"
+	}
+	if !isOffsetExist {
+		offset = "0"
+	}
+
+	//Get statistics from services
+	statistics, err := h.Service.GetAllStats(limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
 			"Error getting statistics",

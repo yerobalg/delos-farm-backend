@@ -1,4 +1,4 @@
-package repository
+package mocks
 
 import (
 	"delos-farm-backend/domains"

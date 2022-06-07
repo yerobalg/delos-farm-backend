@@ -2,12 +2,12 @@ package service
 
 import (
 	"delos-farm-backend/domains"
-	"delos-farm-backend/stats/repository"
+	"delos-farm-backend/domains/mocks"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-var statsRepository = new(repository.StatsRepositoryMock)
+var statsRepository = new(mocks.StatsRepositoryMock)
 var statsService = NewStatsService(statsRepository)
 
 func TestStatsService_CreateSuccess(t *testing.T) {
