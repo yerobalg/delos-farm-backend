@@ -1,30 +1,35 @@
 package repository
 
 import (
-	"context"
 	"delos-farm-backend/domains"
-	"github.com/go-redis/redis/v8"
+	"gorm.io/gorm"
 )
 
 type StatsRepository struct {
-	redisClient *redis.Client
+	conn *gorm.DB
 }
 
-//Constructor for ponds repository
-func NewStatsRepository(rc *redis.Client) domains.StatsRepository {
-	return &StatsRepository{redisClient: rc}
+//Constructor for stats repository
+func NewStatsRepository(conn *gorm.DB) domains.StatsRepository {
+	return &StatsRepository{conn: conn}
 }
 
-//Count api call repository
-func (r *StatsRepository) CountAPICall(path string) (int64, error) {
-	return r.redisClient.Incr(context.Background(), path).Result()
+//Create stats
+func (r *StatsRepository) CreateStats(stats domains.Stats) error {
+	return r.conn.Create(&stats).Error
 }
 
-//Count unique call reposit
-func (r *StatsRepository) CountUniqueCall(ip string) (int64, error) {
-	_, err := r.redisClient.SAdd(context.Background(), "unique_ip", ip).Result()
-	if err != nil {
-		return -1, err
-	}
-	return r.redisClient.SCard(context.Background(), "unique_ip").Result()
+//Get all stats
+func (r *StatsRepository) GetAllStats(
+	limit int,
+	offset int,
+) ([]domains.StatsResults, error) {
+	var results []domains.StatsResults
+	err := r.conn.Model(&domains.Stats{}).Select(
+		"path",
+		"count(ip) as api_call_count",
+		"count(distinct ip) as unique_call_count",
+	).Group("path").Limit(limit).Offset(offset).Find(&results).Error
+
+	return results, err
 }

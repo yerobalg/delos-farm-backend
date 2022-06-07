@@ -8,6 +8,7 @@ type StatsRepositoryMock struct {
 	Mock mock.Mock
 }
 
+// Mock for CountAPICall
 func (r *StatsRepositoryMock) CountAPICall(path string) (int64, error) {
 	args := r.Mock.Called(path)
 	if args.Get(0) == nil && args.Get(1) != nil {
@@ -17,6 +18,7 @@ func (r *StatsRepositoryMock) CountAPICall(path string) (int64, error) {
 	return args.Get(0).(int64), nil
 }
 
+// Mock for CountUniqueCall
 func (r *StatsRepositoryMock) CountUniqueCall(ip string) (int64, error) {
 	args := r.Mock.Called(ip)
 	if args.Get(0) == nil && args.Get(1) != nil {

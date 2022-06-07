@@ -1,9 +1,20 @@
-version: '3.5'
+version: '3.9'
 
 services:
+  postgres:
+    container_name: postgres_delos_farm
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DBNAME}
+    ports:
+      - "2345:5432"
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    
   redis:
-    container_name: redis
+    container_name: redis_delos_farm
     image: redis:latest
     ports:
       - "6379:6379"
-    

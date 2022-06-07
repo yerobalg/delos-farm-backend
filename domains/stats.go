@@ -1,15 +1,21 @@
 package domains
 
 type Stats struct {
-	APICount int64 `json:"api_count"`
-	UniqueCallCount int64 `json:"unique_call_count"`
+	Path string `json:"path" gorm:"not null;column:path"`
+	IP   string `json:"ip" gorm:"not null;column:ip"`
+}
+
+type StatsResults struct {
+	APICallCount    string `json:"api_call_count"`
+	UniqueCallCount string `json:"unique_call_count"`
 }
 
 type StatsService interface {
-	GetStatistics(path string, ip string) (Stats)
+	CreateStats(path string, ip string) (error)
+	GetAllStats(limit string, offset string) ([]StatsResults, error)
 }
 
-type StatsRepository interface{
-	CountAPICall(path string) (int64, error)
-	CountUniqueCall(ip string) (int64, error)
+type StatsRepository interface {
+	CreateStats(stats Stats) error
+	GetAllStats(limit int, offset int) ([]StatsResults, error)
 }

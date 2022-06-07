@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// initializing mock stats repository and stats service
 var statsRepository = new(repository.StatsRepositoryMock)
 var statsService = NewStatsService(statsRepository)
 
