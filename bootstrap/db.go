@@ -29,6 +29,7 @@ func InitPostgres() (*gorm.DB, error) {
 	err := db.AutoMigrate(
 		&domains.Farms{},
 		&domains.Ponds{},
+		&domains.Stats{},
 	)
 
 	return db, err

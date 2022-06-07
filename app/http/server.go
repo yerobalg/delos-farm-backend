@@ -2,15 +2,16 @@ package main
 
 import (
 	"delos-farm-backend/bootstrap"
-	_statsService "delos-farm-backend/stats/service"
-	_statsRepository "delos-farm-backend/stats/repository"
 	farmsHandler "delos-farm-backend/farms/handler"
 	_farmsRepository "delos-farm-backend/farms/repository"
 	_farmsService "delos-farm-backend/farms/service"
-	"delos-farm-backend/middlewares"
 	pondsHandler "delos-farm-backend/ponds/handler"
 	_pondsRepository "delos-farm-backend/ponds/repository"
 	_pondsService "delos-farm-backend/ponds/service"
+	statsHandler "delos-farm-backend/stats/handler"
+	_statsRepository "delos-farm-backend/stats/repository"
+	_statsService "delos-farm-backend/stats/service"
+	"delos-farm-backend/middlewares"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -45,7 +46,8 @@ func main() {
 	//init stats
 	statsRepository := _statsRepository.NewStatsRepository(db)
 	statsService := _statsService.NewStatsService(statsRepository)
-	statsMiddleware := middlewares.NewStatsMiddleware(statsService)	
+	statsMiddleware := middlewares.NewStatsMiddleware(statsService)
+	statsHandler.NewStatsHandler(router, statsService)
 
 	//init farms
 	farmsRepository := _farmsRepository.NewFarmsRepository(db)

@@ -6,12 +6,13 @@ type Stats struct {
 }
 
 type StatsResults struct {
+	Path            string `json:"path"`
 	APICallCount    string `json:"api_call_count"`
 	UniqueCallCount string `json:"unique_call_count"`
 }
 
 type StatsService interface {
-	CreateStats(path string, ip string) (error)
+	CreateStats(path string, ip string) error
 	GetAllStats(limit string, offset string) ([]StatsResults, error)
 }
 

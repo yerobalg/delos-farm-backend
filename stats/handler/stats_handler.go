@@ -32,7 +32,7 @@ func (h *StatsHandler) GetAll(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, helpers.ResponseFormat(
-		"Successfully got statistics",
+		"Successfully retrieved statistics",
 		true,
 		statistics,
 	))
