@@ -41,7 +41,6 @@ func (h *PondsHandler) Create(c *gin.Context) {
 			"Invalid farm id",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -53,7 +52,6 @@ func (h *PondsHandler) Create(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -81,7 +79,6 @@ func (h *PondsHandler) Create(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -90,7 +87,6 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		"Successfully created pond",
 		true,
 		pond,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -107,7 +103,6 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 			"Pond not found",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -118,7 +113,6 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 			"Failed to delete pond",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -127,7 +121,6 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 		"Successfully deleted pond",
 		true,
 		nil,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -144,7 +137,6 @@ func (h *PondsHandler) Get(c *gin.Context) {
 			"Pond not found",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -153,7 +145,6 @@ func (h *PondsHandler) Get(c *gin.Context) {
 		"Successfully retrieved pond",
 		true,
 		pond,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -170,7 +161,6 @@ func (h *PondsHandler) Update(c *gin.Context) {
 			"Pond not found",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -182,7 +172,6 @@ func (h *PondsHandler) Update(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -204,7 +193,6 @@ func (h *PondsHandler) Update(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -213,7 +201,6 @@ func (h *PondsHandler) Update(c *gin.Context) {
 		"Successfully updated pond",
 		true,
 		pond,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -243,7 +230,6 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -252,6 +238,5 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 		"Successfully retrieved ponds",
 		true,
 		ponds,
-		c.MustGet("stats").(domains.Stats),
 	))
 }

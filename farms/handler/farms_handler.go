@@ -40,7 +40,6 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -65,7 +64,6 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -74,7 +72,6 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 		"Successfully created farm",
 		true,
 		farm,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -91,7 +88,6 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 			"Farm not found",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -102,7 +98,6 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 			"Failed to delete farm",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -111,7 +106,6 @@ func (h *FarmsHandler) Delete(c *gin.Context) {
 		"Successfully deleted farm",
 		true,
 		nil,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -128,7 +122,6 @@ func (h *FarmsHandler) Get(c *gin.Context) {
 			"Farm not found",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -137,7 +130,6 @@ func (h *FarmsHandler) Get(c *gin.Context) {
 		"Successfully retrieved farm",
 		true,
 		farm,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -153,7 +145,6 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat("Farm not found",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -165,7 +156,6 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 			"Please fill all required fields",
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -187,7 +177,6 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -196,7 +185,6 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 		"Successfully updated farm",
 		true,
 		farm,
-		c.MustGet("stats").(domains.Stats),
 	))
 }
 
@@ -226,7 +214,6 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 			err.Error(),
 			false,
 			nil,
-			c.MustGet("stats").(domains.Stats),
 		))
 		return
 	}
@@ -235,6 +222,5 @@ func (h *FarmsHandler) GetAll(c *gin.Context) {
 		"Successfully retrieved farms",
 		true,
 		farms,
-		c.MustGet("stats").(domains.Stats),
 	))
 }

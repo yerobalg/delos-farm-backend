@@ -13,12 +13,10 @@ func ResponseFormat(
 	msg string,
 	isSuccess bool,
 	data interface{},
-	stats domains.Stats,
 ) Response {
 	return Response{
 		Message: msg,
 		Success: isSuccess,
 		Data:    data,
-		Stats:   stats,
 	}
 }
