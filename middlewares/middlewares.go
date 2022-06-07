@@ -36,6 +36,9 @@ func NewStatsMiddleware(service domains.StatsService) StatsMiddleware {
 
 func (m StatsMiddleware) GetStatistics() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// this middleware will run after the response is sent to the client
+		c.Next()
+		
 		//get ip address by X-Forwarded-For header
 		clientIP := c.Request.Header.Get("X-Forwarded-For")
 
@@ -51,19 +54,17 @@ func (m StatsMiddleware) GetStatistics() gin.HandlerFunc {
 			clientIP = c.Request.Header.Get("X-Real-IP")
 		}
 
-		// then the 
+		// then get IP by socket remote address
 		if len(clientIP) == 0 {
 			clientIP = c.Request.RemoteAddr
 		}
 
 		//get path
 		path := fmt.Sprintf("%s_%s", c.Request.Method, c.Request.URL.Path)
-		fmt.Println(path)
 
-		//get statistics from service
-		stats := m.service.GetStatistics(path, clientIP)
-
-		//set statistics to context
-		c.Set("stats", stats)
+		//record the user's ip and path
+		if err:= m.service.CreateStats(path, clientIP); err != nil {
+			fmt.Println(err)
+		}
 	}
 }

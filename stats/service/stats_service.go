@@ -2,6 +2,7 @@ package service
 
 import (
 	"delos-farm-backend/domains"
+	"strconv"
 )
 
 type StatsService struct {
@@ -12,23 +13,17 @@ func NewStatsService(repo domains.StatsRepository) domains.StatsService {
 	return &StatsService{repo: repo}
 }
 
-func (s *StatsService) GetStatistics(path string, ip string) domains.Stats {
-	stats := domains.Stats{
-		APICount:        0,
-		UniqueCallCount: 0,
-	}
+func (s *StatsService) CreateStats(path string, ip string) error {
+	stats := domains.Stats{Path: path, IP: ip}
+	return s.repo.CreateStats(stats)
+}
 
-	apiCount, err := s.repo.CountAPICall(path)
-	if err != nil {
-		return stats
-	}
-	stats.APICount = apiCount
+func (s *StatsService) GetAllStats(
+	limit string, 
+	offset string,
+) ([]domains.StatsResults, error) {
+	limitInt, _ := strconv.Atoi(limit)
+	offsetInt, _ := strconv.Atoi(offset)
 
-	uniqueCallCount, err := s.repo.CountUniqueCall(ip)
-	if err != nil {
-		return stats
-	}
-	stats.UniqueCallCount = uniqueCallCount
-
-	return stats
+	return s.repo.GetAllStats(limitInt, offsetInt)
 }
