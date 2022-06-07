@@ -18,7 +18,6 @@ import (
 )
 
 func main() {
-
 	//init env variable
 	if err := godotenv.Load(".env"); err != nil {
 		fmt.Println("failed to load env from local file")
@@ -26,11 +25,6 @@ func main() {
 
 	//init database
 	db, err := bootstrap.InitPostgres()
-	if err != nil {
-		panic(err)
-	}
-
-	redisClient, err := bootstrap.InitRedisClient()
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +43,7 @@ func main() {
 	})
 
 	//init stats
-	statsRepository := _statsRepository.NewStatsRepository(redisClient)
+	statsRepository := _statsRepository.NewStatsRepository(db)
 	statsService := _statsService.NewStatsService(statsRepository)
 	statsMiddleware := middlewares.NewStatsMiddleware(statsService)	
 
