@@ -16,13 +16,13 @@ In this project, im using Clean Architecture principles with Domain Design Drive
 
 # Installation
 ```
-1. Clone this repository: git clone git clone https://github.com/yerobalg/delos-farm.git
-2. Enter to directory   : cd delos-farm-backend
+1. Clone this repository    : git clone git clone https://github.com/yerobalg/delos-farm.git
+2. Enter to directory       : cd delos-farm-backend
 3. Copy or rename the .env.example file, enter your credential
-3. Run postgres db      : docker compose up -d
-4. Run test             : go test -v ./...
-5. Run go app           : go run ./app/http/
-6. If you wanna shut down db: docker compose down 
+3. Run postgres db          : docker compose up -d
+4. Run test                 : go test -v ./...
+5. Run go app               : go run ./app/http/
+6. To shut down db: docker compose down 
 ```
 
 **Note:**: to avoid error, do not run the postgres DB in port 5432 
