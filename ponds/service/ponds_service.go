@@ -35,7 +35,10 @@ func (s *PondsService) Create(
 		return pond, nil
 	}
 	if (strings.Contains(err.Error(), "duplicate key value")) {
-		return nil, errors.New("Pomd already exists")
+		return nil, errors.New("Pond already exists")
+	}
+	if (strings.Contains(err.Error(), "violates foreign key constraint")) {
+		return nil, errors.New("Farm not found")
 	}
 	return nil, err	
 }

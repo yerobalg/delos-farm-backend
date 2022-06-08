@@ -32,7 +32,7 @@ func (r *FarmsRepository) Update(farm *domains.Farms) error {
 //get farm by id repository
 func (r *FarmsRepository) Get(id uint) (domains.Farms, error) {
 	var farm domains.Farms
-	err := r.conn.First(&farm, id).Error
+	err := r.conn.Preload("Ponds").First(&farm).Error
 	return farm, err
 }
 
@@ -43,10 +43,10 @@ func (r *FarmsRepository) GetAll(
 ) ([]domains.Farms, error) {
 	var farms []domains.Farms
 	err := r.conn.
-		Limit(limit).
-		Offset(offset).
 		Preload("Ponds").
 		Find(&farms).
+		Limit(limit).
+		Offset(offset).
 		Error
 	return farms, err
 }
