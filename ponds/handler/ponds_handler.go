@@ -4,12 +4,12 @@ import (
 	"delos-farm-backend/domains"
 	"delos-farm-backend/helpers"
 	"delos-farm-backend/middlewares"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 	"net/http"
 	"strconv"
 	"time"
-	"fmt"
 )
 
 type PondsHandler struct {
@@ -56,7 +56,6 @@ func (h *PondsHandler) Create(c *gin.Context) {
 		))
 		return
 	}
-
 
 	//Create the pond, and will return error if insert duplicate name
 	pond, err := h.Service.Create(
