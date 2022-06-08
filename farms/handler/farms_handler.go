@@ -178,7 +178,7 @@ func (h *FarmsHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, helpers.ResponseFormat(
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
 		"Successfully updated farm",
 		true,
 		farm,

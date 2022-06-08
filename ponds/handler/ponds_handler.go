@@ -13,15 +13,15 @@ import (
 )
 
 type PondsHandler struct {
-	service domains.PondsService
+	Service domains.PondsService
 }
 
 func NewPondsHandler(
 	r *gin.RouterGroup,
-	service domains.PondsService,
+	Service domains.PondsService,
 	statsMiddleware middlewares.StatsMiddleware,
 ) {
-	handler := &PondsHandler{service: service}
+	handler := &PondsHandler{Service: Service}
 	api := r.Group("/ponds")
 	{
 		api.POST("/:farmId", statsMiddleware.GetStatistics(), handler.Create)
@@ -59,7 +59,7 @@ func (h *PondsHandler) Create(c *gin.Context) {
 
 
 	//Create the pond, and will return error if insert duplicate name
-	pond, err := h.service.Create(
+	pond, err := h.Service.Create(
 		input.Name,
 		fmt.Sprintf("%s_%s", farmId, slug.Make(input.Name)),
 		uint(farmIdNum),
@@ -96,7 +96,7 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 	idNum, _ := strconv.Atoi(id)
 
 	//Find pond by id, if not found return error
-	pond, err := h.service.Get(uint(idNum))
+	pond, err := h.Service.Get(uint(idNum))
 	if err != nil && err.Error() == "Pond not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Pond not found",
@@ -107,7 +107,7 @@ func (h *PondsHandler) Delete(c *gin.Context) {
 	}
 
 	//Delete the pond
-	if err := h.service.Delete(&pond); err != nil {
+	if err := h.Service.Delete(&pond); err != nil {
 		c.JSON(http.StatusInternalServerError, helpers.ResponseFormat(
 			"Failed to delete pond",
 			false,
@@ -130,7 +130,7 @@ func (h *PondsHandler) Get(c *gin.Context) {
 	idNum, _ := strconv.Atoi(id)
 
 	//Find pond by id, if not found return error
-	pond, err := h.service.Get(uint(idNum))
+	pond, err := h.Service.Get(uint(idNum))
 	if err != nil && err.Error() == "Pond not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Pond not found",
@@ -154,7 +154,7 @@ func (h *PondsHandler) Update(c *gin.Context) {
 	idNum, _ := strconv.Atoi(id)
 
 	//Find pond by id, if not found return error
-	pond, err := h.service.Get(uint(idNum))
+	pond, err := h.Service.Get(uint(idNum))
 	if err != nil && err.Error() == "Pond not found" {
 		c.JSON(http.StatusNotFound, helpers.ResponseFormat(
 			"Pond not found",
@@ -180,7 +180,7 @@ func (h *PondsHandler) Update(c *gin.Context) {
 	pond.UpdatedAt = time.Now().Unix()
 
 	//Update pond, and will return error if insert duplicate name
-	if err := h.service.Update(&pond); err != nil {
+	if err := h.Service.Update(&pond); err != nil {
 		statusCode := http.StatusInternalServerError
 
 		//if error is duplicate key value
@@ -196,7 +196,7 @@ func (h *PondsHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, helpers.ResponseFormat(
+	c.JSON(http.StatusOK, helpers.ResponseFormat(
 		"Successfully updated pond",
 		true,
 		pond,
@@ -218,7 +218,7 @@ func (h *PondsHandler) GetAll(c *gin.Context) {
 	}
 
 	//get the ponds, and will return error if not found
-	ponds, err := h.service.GetAll(limit, offset)
+	ponds, err := h.Service.GetAll(limit, offset)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "No ponds found" {
