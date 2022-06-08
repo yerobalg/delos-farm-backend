@@ -45,12 +45,12 @@ func (h *FarmsHandler) Create(c *gin.Context) {
 	}
 
 	//create farm entity
-	name:= input.Name
-	slug:= slug.Make(name)
+	name := input.Name
+	slug := slug.Make(name)
 
 	//Create the farm, and will return error if insert duplicate name
-	farm, err := h.Service.Create(name, slug);
-	if  err != nil {
+	farm, err := h.Service.Create(name, slug)
+	if err != nil {
 		statusCode := http.StatusInternalServerError
 		//if error is duplicate key value
 		if err.Error() == "Farm already exists" {
