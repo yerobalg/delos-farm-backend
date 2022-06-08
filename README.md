@@ -22,7 +22,7 @@ In this project, im using Clean Architecture principles with Domain Design Drive
 3. Run postgres db          : docker compose up -d
 4. Run test                 : go test -v ./...
 5. Run go app               : go run ./app/http/
-6. To shut down db: docker compose down 
+6. To shut down db          : docker compose down 
 ```
 
 **Note:**: to avoid error, do not run the postgres DB in port 5432 
